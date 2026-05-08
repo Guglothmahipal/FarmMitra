@@ -1,0 +1,272 @@
+# =========================================================
+# FARMMITRA - PRODUCTION GRADE GITIGNORE
+# Flutter + Android + iOS + Web + Backend + Docker + DevOps
+# =========================================================
+
+# =========================================================
+# FLUTTER / DART
+# =========================================================
+
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub/
+.pub-cache/
+build/
+coverage/
+.flutter-versions
+.metadata
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# Flutter generated
+ios/Flutter/Flutter.podspec
+ios/Flutter/flutter_export_environment.sh
+ios/Flutter/Generated.xcconfig
+ios/Flutter/ephemeral/
+
+# =========================================================
+# ANDROID
+# =========================================================
+
+android/.gradle/
+android/app/debug/
+android/app/profile/
+android/app/release/
+android/local.properties
+android/captures/
+android/key.properties
+
+# APK / AAB
+*.apk
+*.aab
+
+# NDK
+android/.cxx/
+
+# =========================================================
+# IOS
+# =========================================================
+
+ios/.symlinks/
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+
+# Xcode
+*.xcuserstate
+*.xcworkspace
+*.xcuserdata
+
+# =========================================================
+# MACOS
+# =========================================================
+
+macos/Pods/
+macos/Flutter/ephemeral/
+
+# =========================================================
+# LINUX / WINDOWS
+# =========================================================
+
+linux/flutter/ephemeral/
+windows/flutter/ephemeral/
+
+# =========================================================
+# WEB
+# =========================================================
+
+web/firebase-messaging-sw.js
+
+# =========================================================
+# ENVIRONMENT FILES
+# =========================================================
+
+.env
+.env.*
+!.env.example
+
+# Secrets
+secrets/
+keys/
+credentials/
+*.pem
+*.p12
+*.jks
+*.keystore
+*.key
+
+# Firebase
+google-services.json
+GoogleService-Info.plist
+firebase_options.dart
+
+# =========================================================
+# DATABASE
+# =========================================================
+
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# Drift generated DBs
+*.moor.dart
+
+# =========================================================
+# LOGS
+# =========================================================
+
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================================================
+# IDE / EDITOR
+# =========================================================
+
+# VS Code
+.vscode/
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+
+# Fleet
+.fleet/
+
+# Cursor
+.cursor/
+
+# Sublime
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+
+# =========================================================
+# OS FILES
+# =========================================================
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Linux
+*~
+
+# =========================================================
+# NODE.JS / FRONTEND
+# =========================================================
+
+node_modules/
+dist/
+.next/
+.nuxt/
+.vercel/
+.cache/
+
+# =========================================================
+# PYTHON / AI SERVICES
+# =========================================================
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.envrc
+.pytest_cache/
+.mypy_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# =========================================================
+# GO BACKEND
+# =========================================================
+
+bin/
+pkg/
+vendor/
+
+# =========================================================
+# DOCKER
+# =========================================================
+
+docker-data/
+*.tar
+
+# Docker overrides
+docker-compose.override.yml
+
+# =========================================================
+# TERRAFORM / INFRASTRUCTURE
+# =========================================================
+
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+crash.log
+
+# =========================================================
+# AWS / CLOUD
+# =========================================================
+
+.aws/
+aws-exports.js
+
+# =========================================================
+# TEST / REPORTS
+# =========================================================
+
+test-results/
+reports/
+playwright-report/
+coverage/
+
+# =========================================================
+# TEMP FILES
+# =========================================================
+
+tmp/
+temp/
+.cache-loader/
+
+# =========================================================
+# CODEX / AI TOOLS
+# =========================================================
+
+.codex/
+.codex-cache/
+.codex-temp/
+
+# =========================================================
+# LOCAL DEVELOPMENT
+# =========================================================
+
+.local/
+.devcontainer/
+
+# =========================================================
+# OPTIONAL - KEEP EXAMPLE CONFIGS
+# =========================================================
+
+!.env.example
+!docker-compose.example.yml
+!application.example.yaml
