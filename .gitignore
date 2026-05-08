@@ -22,6 +22,7 @@ coverage/
 *.g.dart
 *.freezed.dart
 *.mocks.dart
+!mobile/farmmitra_app/lib/core/database/app_database.g.dart
 
 # Flutter generated
 ios/Flutter/Flutter.podspec
@@ -91,6 +92,8 @@ web/firebase-messaging-sw.js
 .env
 .env.*
 !.env.example
+!mobile/farmmitra_app/assets/env/.env.example
+!mobile/farmmitra_app/assets/env/.env.development
 
 # Secrets
 secrets/

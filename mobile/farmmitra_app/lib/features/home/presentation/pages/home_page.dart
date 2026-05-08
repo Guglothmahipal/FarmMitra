@@ -1,6 +1,7 @@
 import 'package:farmmitra_app/config/theme/app_colors.dart';
 import 'package:farmmitra_app/core/constants/app_constants.dart';
 import 'package:farmmitra_app/core/network/network_status.dart';
+import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:farmmitra_app/features/home/domain/entities/architecture_status.dart';
 import 'package:farmmitra_app/features/home/presentation/controllers/home_providers.dart';
 import 'package:farmmitra_app/shared/widgets/async_state_view.dart';
@@ -15,7 +16,18 @@ class HomePage extends ConsumerWidget {
     final status = ref.watch(architectureStatusProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text(AppConstants.appName)),
+      appBar: AppBar(
+        title: const Text(AppConstants.appName),
+        actions: [
+          IconButton(
+            tooltip: 'Sign out',
+            onPressed: () {
+              ref.read(authControllerProvider.notifier).signOut();
+            },
+            icon: const Icon(Icons.logout),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () => ref.refresh(architectureStatusProvider.future),
