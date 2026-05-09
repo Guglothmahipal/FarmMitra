@@ -6,6 +6,7 @@ import 'package:farmmitra_app/features/jobs/domain/entities/farm_job.dart';
 import 'package:farmmitra_app/features/jobs/presentation/providers/jobs_providers.dart';
 import 'package:farmmitra_app/features/jobs/presentation/widgets/job_card.dart';
 import 'package:farmmitra_app/shared/widgets/app_empty_state.dart';
+import 'package:farmmitra_app/shared/widgets/app_loading_view.dart';
 import 'package:farmmitra_app/shared/widgets/app_primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,7 +35,7 @@ class JobsPage extends ConsumerWidget {
       body: RefreshIndicator(
         onRefresh: () => ref.read(jobsControllerProvider.notifier).load(),
         child: jobsState.isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? const AppLoadingView(message: 'Loading jobs...')
             : jobsState.filteredJobs.isEmpty
             ? _EmptyJobs(isFarmer: isFarmer)
             : ListView.separated(
@@ -75,7 +76,7 @@ class _EmptyJobs extends StatelessWidget {
           title: isFarmer ? 'No jobs posted yet' : 'No jobs found',
           message: isFarmer
               ? 'Create your first labour requirement and it will be saved offline.'
-              : 'Try changing filters or check again later.',
+              : 'No open farm work is visible right now. Try another village, wage, or check again later.',
           action: isFarmer
               ? AppPrimaryButton(
                   label: 'Create Job',
@@ -236,7 +237,18 @@ class _WorkerJobActions extends ConsumerWidget {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 8),
-              Text('${job.location} • Rs ${job.wage}/day'),
+              Text('${job.location} - Rs ${job.wage}/day'),
+              const SizedBox(height: 12),
+              const Card(
+                child: ListTile(
+                  dense: true,
+                  leading: Icon(Icons.offline_bolt_outlined),
+                  title: Text('Saved offline first'),
+                  subtitle: Text(
+                    'Your application stays on this phone and queues for sync.',
+                  ),
+                ),
+              ),
               const SizedBox(height: 12),
               TextField(
                 controller: messageController,
@@ -277,7 +289,10 @@ class _WorkerJobActions extends ConsumerWidget {
           .applyForJob(job, message: messageController.text);
       if (success && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Application saved offline.')),
+          const SnackBar(
+            content: Text('Application saved offline and queued for sync.'),
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
     }

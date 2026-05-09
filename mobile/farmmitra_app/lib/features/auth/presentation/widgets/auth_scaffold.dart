@@ -18,6 +18,7 @@ class AuthScaffold extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: showBackButton,
+        centerTitle: false,
         title: Text(title ?? AppConstants.appName),
       ),
       body: SafeArea(
@@ -25,7 +26,7 @@ class AuthScaffold extends StatelessWidget {
           builder: (context, constraints) {
             return SingleChildScrollView(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: Center(

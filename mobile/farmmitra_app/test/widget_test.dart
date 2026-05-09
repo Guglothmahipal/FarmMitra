@@ -1,6 +1,9 @@
 import 'package:farmmitra_app/app/farmmitra_app.dart';
+import 'package:farmmitra_app/config/localization/app_language.dart';
+import 'package:farmmitra_app/config/localization/language_controller.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/auth_session.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/local_account.dart';
+import 'package:farmmitra_app/features/auth/domain/entities/mock_google_account.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/user_role.dart';
 import 'package:farmmitra_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
@@ -13,6 +16,7 @@ import 'package:farmmitra_app/features/profile/domain/entities/profile_snapshot.
 import 'package:farmmitra_app/features/profile/domain/entities/worker_profile.dart';
 import 'package:farmmitra_app/features/profile/domain/repositories/profile_repository.dart';
 import 'package:farmmitra_app/features/profile/presentation/providers/profile_providers.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -28,6 +32,12 @@ void main() {
           ),
           profileRepositoryProvider.overrideWith((ref) => _ProfileRepo()),
           jobsRepositoryProvider.overrideWith((ref) => _JobsRepo()),
+          languageStateOverrideProvider.overrideWithValue(
+            const LanguageState(
+              language: AppLanguage.english,
+              hasSelectedLanguage: true,
+            ),
+          ),
         ],
         child: const FarmMitraApp(),
       ),
@@ -36,8 +46,15 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('FarmMitra'), findsOneWidget);
-    expect(find.text('Create Job'), findsOneWidget);
     expect(find.text('Active jobs'), findsOneWidget);
+    expect(find.text('Weather and work condition'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('Create Job'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Create Job'), findsOneWidget);
   });
 }
 
@@ -68,6 +85,10 @@ final class _AuthenticatedAuthRepo implements AuthRepository {
   Future<List<LocalAccount>> readAccounts() async => const [];
 
   @override
+  Future<List<MockGoogleAccount>> readMockGoogleAccounts(UserRole role) async =>
+      const [];
+
+  @override
   Future<void> requestOtp(String phoneNumber) async {}
 
   @override
@@ -83,6 +104,33 @@ final class _AuthenticatedAuthRepo implements AuthRepository {
       refreshToken: 'test-refresh',
       phoneNumber: phoneNumber,
       role: role,
+    );
+  }
+
+  @override
+  Future<AuthSession> signInWithGoogle({
+    required MockGoogleAccount account,
+    required UserRole role,
+  }) async {
+    return AuthSession(
+      id: 'test-google-session',
+      localUserId: 'test-google-user',
+      accessToken: 'test-google-access',
+      refreshToken: 'test-google-refresh',
+      phoneNumber: account.phoneNumber,
+      role: role,
+    );
+  }
+
+  @override
+  Future<AuthSession> switchAccount(LocalAccount account) async {
+    return AuthSession(
+      id: 'test-switched-session',
+      localUserId: account.id,
+      accessToken: 'test-switched-access',
+      refreshToken: 'test-switched-refresh',
+      phoneNumber: account.phoneNumber,
+      role: account.role,
     );
   }
 

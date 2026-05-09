@@ -1,3 +1,4 @@
+import 'package:farmmitra_app/features/auth/domain/entities/auth_method.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/user_role.dart';
 
 enum AuthStatus { checking, unauthenticated, authenticated }
@@ -12,6 +13,7 @@ final class AuthState {
     this.sessionId,
     this.phoneNumber,
     this.pendingPhoneNumber,
+    this.authMethod,
     this.errorMessage,
   });
 
@@ -23,6 +25,7 @@ final class AuthState {
       sessionId = null,
       phoneNumber = null,
       pendingPhoneNumber = null,
+      authMethod = null,
       isSubmitting = false,
       errorMessage = null;
 
@@ -33,6 +36,7 @@ final class AuthState {
   final String? sessionId;
   final String? phoneNumber;
   final String? pendingPhoneNumber;
+  final AuthMethod? authMethod;
   final bool isSubmitting;
   final String? errorMessage;
 
@@ -46,6 +50,7 @@ final class AuthState {
     String? sessionId,
     String? phoneNumber,
     String? pendingPhoneNumber,
+    AuthMethod? authMethod,
     bool? isSubmitting,
     String? errorMessage,
     bool clearPendingPhoneNumber = false,
@@ -65,6 +70,7 @@ final class AuthState {
       pendingPhoneNumber: clearPendingPhoneNumber
           ? null
           : pendingPhoneNumber ?? this.pendingPhoneNumber,
+      authMethod: clearActiveSession ? null : authMethod ?? this.authMethod,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
     );

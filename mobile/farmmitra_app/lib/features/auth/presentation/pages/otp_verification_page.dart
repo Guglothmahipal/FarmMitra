@@ -5,6 +5,7 @@ import 'package:farmmitra_app/features/auth/presentation/widgets/auth_scaffold.d
 import 'package:farmmitra_app/shared/widgets/app_error_message.dart';
 import 'package:farmmitra_app/shared/widgets/app_primary_button.dart';
 import 'package:farmmitra_app/shared/widgets/app_text_field.dart';
+import 'package:farmmitra_app/shared/widgets/voice_instruction_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -49,6 +50,11 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const VoiceInstructionButton(
+              instruction:
+                  'Enter any six digit OTP for now. Real OTP checking will be added with the backend.',
+            ),
+            const SizedBox(height: 16),
             AppTextField(
               controller: _otpController,
               label: 'OTP',
@@ -68,10 +74,18 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
             ],
             const SizedBox(height: 20),
             AppPrimaryButton(
-              label: 'Verify and continue',
+              label: authState.isSubmitting
+                  ? 'Verifying...'
+                  : 'Verify and continue',
               icon: Icons.verified_user_outlined,
               isLoading: authState.isSubmitting,
               onPressed: _submit,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Resend OTP available in 30 seconds',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 8),
             TextButton(

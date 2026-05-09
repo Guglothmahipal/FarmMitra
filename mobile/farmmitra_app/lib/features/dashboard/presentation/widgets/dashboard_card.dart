@@ -1,3 +1,4 @@
+import 'package:farmmitra_app/shared/widgets/voice_instruction_button.dart';
 import 'package:flutter/material.dart';
 
 class DashboardCard extends StatelessWidget {
@@ -6,6 +7,7 @@ class DashboardCard extends StatelessWidget {
     required this.subtitle,
     required this.icon,
     this.trailing,
+    this.voiceInstruction,
     this.onTap,
     super.key,
   });
@@ -14,6 +16,7 @@ class DashboardCard extends StatelessWidget {
   final String subtitle;
   final IconData icon;
   final Widget? trailing;
+  final String? voiceInstruction;
   final VoidCallback? onTap;
 
   @override
@@ -50,6 +53,13 @@ class DashboardCard extends StatelessWidget {
                   ],
                 ),
               ),
+              if (voiceInstruction != null) ...[
+                const SizedBox(width: 8),
+                VoiceInstructionButton(
+                  instruction: voiceInstruction!,
+                  compact: true,
+                ),
+              ],
               if (trailing != null) ...[const SizedBox(width: 8), trailing!],
             ],
           ),

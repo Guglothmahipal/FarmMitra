@@ -10,6 +10,7 @@ import 'package:farmmitra_app/features/profile/presentation/widgets/profile_empt
 import 'package:farmmitra_app/features/profile/presentation/widgets/profile_header.dart';
 import 'package:farmmitra_app/features/profile/presentation/widgets/profile_section_card.dart';
 import 'package:farmmitra_app/features/profile/presentation/widgets/profile_tag_wrap.dart';
+import 'package:farmmitra_app/shared/widgets/app_loading_view.dart';
 import 'package:farmmitra_app/shared/widgets/app_primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,7 +30,7 @@ class ProfileDashboardPage extends ConsumerWidget {
         IconButton(
           tooltip: 'Edit profile',
           onPressed: profileState.hasCompletedProfile
-              ? () => context.go(AppRoutes.profileEdit)
+              ? () => context.push(AppRoutes.profileEdit)
               : null,
           icon: const Icon(Icons.edit_outlined),
         ),
@@ -47,7 +48,7 @@ class _DashboardBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (profileState.status == ProfileStatus.checking) {
-      return const Center(child: CircularProgressIndicator());
+      return const AppLoadingView(message: 'Loading profile...');
     }
 
     final profile = profileState.profile;

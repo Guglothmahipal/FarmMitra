@@ -3,6 +3,8 @@ import 'package:farmmitra_app/features/auth/presentation/controllers/auth_provid
 import 'package:farmmitra_app/features/jobs/domain/entities/farm_job.dart';
 import 'package:farmmitra_app/features/jobs/presentation/providers/jobs_providers.dart';
 import 'package:farmmitra_app/features/jobs/presentation/widgets/job_card.dart';
+import 'package:farmmitra_app/shared/widgets/app_empty_state.dart';
+import 'package:farmmitra_app/shared/widgets/app_page_scaffold.dart';
 import 'package:farmmitra_app/shared/widgets/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,9 +27,13 @@ class JobDetailPage extends ConsumerWidget {
     }
 
     if (job == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Job details')),
-        body: const Center(child: Text('Job not found')),
+      return const AppPageScaffold(
+        title: 'Job details',
+        body: AppEmptyState(
+          icon: Icons.search_off,
+          title: 'Job not found',
+          message: 'This job may have been changed or removed from local data.',
+        ),
       );
     }
 
@@ -36,66 +42,74 @@ class JobDetailPage extends ConsumerWidget {
       (application) => application.jobId == currentJob.id,
     );
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Job details')),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            JobCard(job: currentJob),
-            const SizedBox(height: 12),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(currentJob.description),
-              ),
-            ),
-            if (role == UserRole.worker) ...[
-              const SizedBox(height: 16),
-              FilledButton.icon(
-                onPressed: applied || !currentJob.canApply
-                    ? null
-                    : () {
-                        _showApplySheet(context, ref, currentJob);
-                      },
-                icon: Icon(applied ? Icons.check : Icons.send_outlined),
-                label: Text(applied ? 'Already applied' : 'Apply for this job'),
-              ),
-            ] else ...[
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
+    return AppPageScaffold(
+      title: 'Job details',
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          JobCard(job: currentJob),
+          const SizedBox(height: 12),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  FilledButton.tonalIcon(
-                    onPressed: currentJob.status == JobStatus.archived
-                        ? null
-                        : () => _confirmStatus(
-                            context,
-                            ref,
-                            currentJob,
-                            JobStatus.archived,
-                          ),
-                    icon: const Icon(Icons.archive_outlined),
-                    label: const Text('Archive'),
+                  Text(
+                    'Work description',
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  OutlinedButton.icon(
-                    onPressed: currentJob.status == JobStatus.filled
-                        ? null
-                        : () => _confirmStatus(
-                            context,
-                            ref,
-                            currentJob,
-                            JobStatus.filled,
-                          ),
-                    icon: const Icon(Icons.task_alt),
-                    label: const Text('Mark filled'),
-                  ),
+                  const SizedBox(height: 8),
+                  Text(currentJob.description),
                 ],
               ),
-            ],
+            ),
+          ),
+          if (role == UserRole.worker) ...[
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: applied || !currentJob.canApply
+                  ? null
+                  : () {
+                      _showApplySheet(context, ref, currentJob);
+                    },
+              icon: Icon(applied ? Icons.check : Icons.send_outlined),
+              label: Text(applied ? 'Already applied' : 'Apply for this job'),
+            ),
+          ] else ...[
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                FilledButton.tonalIcon(
+                  onPressed: currentJob.status == JobStatus.archived
+                      ? null
+                      : () => _confirmStatus(
+                          context,
+                          ref,
+                          currentJob,
+                          JobStatus.archived,
+                        ),
+                  icon: const Icon(Icons.archive_outlined),
+                  label: const Text('Archive'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: currentJob.status == JobStatus.filled
+                      ? null
+                      : () => _confirmStatus(
+                          context,
+                          ref,
+                          currentJob,
+                          JobStatus.filled,
+                        ),
+                  icon: const Icon(Icons.task_alt),
+                  label: const Text('Mark filled'),
+                ),
+              ],
+            ),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -129,11 +143,12 @@ class JobDetailPage extends ConsumerWidget {
     final confirmed = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
+      showDragHandle: true,
       builder: (context) => Padding(
         padding: EdgeInsets.only(
           left: 16,
           right: 16,
-          top: 16,
+          top: 4,
           bottom: MediaQuery.viewInsetsOf(context).bottom + 16,
         ),
         child: Column(
@@ -145,7 +160,18 @@ class JobDetailPage extends ConsumerWidget {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
-            Text('${job.location} • Rs ${job.wage}/day'),
+            Text('${job.location} - Rs ${job.wage}/day'),
+            const SizedBox(height: 12),
+            const Card(
+              child: ListTile(
+                dense: true,
+                leading: Icon(Icons.offline_bolt_outlined),
+                title: Text('Offline application'),
+                subtitle: Text(
+                  'This request will be stored locally and synced later.',
+                ),
+              ),
+            ),
             const SizedBox(height: 12),
             TextField(
               controller: messageController,
@@ -184,7 +210,10 @@ class JobDetailPage extends ConsumerWidget {
           .applyForJob(job, message: messageController.text);
       if (success && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Application saved offline.')),
+          const SnackBar(
+            content: Text('Application saved offline and queued for sync.'),
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
     }

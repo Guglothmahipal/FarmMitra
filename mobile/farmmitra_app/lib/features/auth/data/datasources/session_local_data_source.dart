@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:farmmitra_app/core/database/app_database.dart' as db;
 import 'package:farmmitra_app/core/storage/secure_storage_service.dart';
+import 'package:farmmitra_app/features/auth/domain/entities/auth_method.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/auth_session.dart'
     as domain;
 import 'package:farmmitra_app/features/auth/domain/entities/local_account.dart';
@@ -51,6 +52,7 @@ final class SessionLocalDataSource {
       refreshToken: refreshToken,
       phoneNumber: user.phoneNumber,
       role: UserRole.fromStorageValue(user.role) ?? UserRole.farmer,
+      method: AuthMethod.otp,
     );
   }
 

@@ -1,4 +1,6 @@
 import 'package:farmmitra_app/core/errors/app_exception.dart';
+import 'package:farmmitra_app/features/auth/domain/entities/local_account.dart';
+import 'package:farmmitra_app/features/auth/domain/entities/mock_google_account.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/user_role.dart';
 import 'package:farmmitra_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_dependencies.dart';
@@ -29,6 +31,7 @@ final class AuthController extends Notifier<AuthState> {
       localUserId: session?.localUserId,
       sessionId: session?.id,
       phoneNumber: session?.phoneNumber,
+      authMethod: session?.method,
       clearActiveSession: session == null,
       clearError: true,
     );
@@ -94,6 +97,7 @@ final class AuthController extends Notifier<AuthState> {
         localUserId: session.localUserId,
         sessionId: session.id,
         phoneNumber: session.phoneNumber,
+        authMethod: session.method,
         isSubmitting: false,
         clearPendingPhoneNumber: true,
         clearError: true,
@@ -106,6 +110,67 @@ final class AuthController extends Notifier<AuthState> {
       state = state.copyWith(
         isSubmitting: false,
         errorMessage: 'Could not verify OTP. Please try again.',
+      );
+      return false;
+    }
+  }
+
+  Future<bool> continueWithGoogle(MockGoogleAccount account) async {
+    final role = state.selectedRole;
+    if (role == null) {
+      state = state.copyWith(errorMessage: 'Please select your role first.');
+      return false;
+    }
+
+    state = state.copyWith(isSubmitting: true, clearError: true);
+
+    try {
+      final session = await _repository.signInWithGoogle(
+        account: account,
+        role: role,
+      );
+
+      state = state.copyWith(
+        status: AuthStatus.authenticated,
+        selectedRole: session.role,
+        localUserId: session.localUserId,
+        sessionId: session.id,
+        phoneNumber: session.phoneNumber,
+        authMethod: session.method,
+        isSubmitting: false,
+        clearPendingPhoneNumber: true,
+        clearError: true,
+      );
+      return true;
+    } catch (_) {
+      state = state.copyWith(
+        isSubmitting: false,
+        errorMessage: 'Could not continue with Google placeholder.',
+      );
+      return false;
+    }
+  }
+
+  Future<bool> switchToAccount(LocalAccount account) async {
+    state = state.copyWith(isSubmitting: true, clearError: true);
+    try {
+      final session = await _repository.switchAccount(account);
+      state = state.copyWith(
+        status: AuthStatus.authenticated,
+        selectedRole: session.role,
+        localUserId: session.localUserId,
+        sessionId: session.id,
+        phoneNumber: session.phoneNumber,
+        authMethod: session.method,
+        isSubmitting: false,
+        clearPendingPhoneNumber: true,
+        clearError: true,
+      );
+      return true;
+    } catch (_) {
+      state = state.copyWith(
+        isSubmitting: false,
+        errorMessage: 'Could not switch account. Please login again.',
       );
       return false;
     }

@@ -2,6 +2,7 @@ import 'package:farmmitra_app/config/routing/app_routes.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/onboarding_controller.dart';
 import 'package:farmmitra_app/shared/widgets/app_primary_button.dart';
+import 'package:farmmitra_app/shared/widgets/voice_instruction_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -18,22 +19,34 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   static const _pages = [
     _OnboardingSlide(
-      icon: Icons.agriculture,
-      title: 'Find trusted farm workers',
+      icon: Icons.offline_bolt_outlined,
+      title: 'Works in low network',
       description:
-          'Farmers can post work needs, wages, dates, and village details in a simple mobile flow.',
+          'Important profile, job, and application details stay available on this phone.',
     ),
     _OnboardingSlide(
-      icon: Icons.work_outline,
-      title: 'Discover nearby farm jobs',
+      icon: Icons.location_on_outlined,
+      title: 'Find nearby jobs and workers',
       description:
-          'Workers can find local opportunities, share availability, and receive job updates.',
+          'Farmers can post village work. Workers can discover local farm jobs.',
     ),
     _OnboardingSlide(
-      icon: Icons.cloud_sync_outlined,
-      title: 'Built for rural connectivity',
+      icon: Icons.wb_sunny_outlined,
+      title: 'Weather alerts ready',
       description:
-          'FarmMitra keeps the app readable, lightweight, and ready for offline-first workflows.',
+          'Weather and farm planning alerts will connect as the platform grows.',
+    ),
+    _OnboardingSlide(
+      icon: Icons.translate_outlined,
+      title: 'Local language support',
+      description:
+          'Choose your comfortable language now. More translations will be added step by step.',
+    ),
+    _OnboardingSlide(
+      icon: Icons.volume_up_outlined,
+      title: 'Voice assistance ready',
+      description:
+          'Speaker buttons can guide users who prefer hearing instructions.',
     ),
   ];
 
@@ -61,10 +74,16 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           child: Column(
             children: [
               Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: _finish,
-                  child: const Text('Skip'),
+                alignment: Alignment.center,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: VoiceInstructionButton(
+                        instruction: _pages[pageIndex].description,
+                      ),
+                    ),
+                    TextButton(onPressed: _finish, child: const Text('Skip')),
+                  ],
                 ),
               ),
               Expanded(

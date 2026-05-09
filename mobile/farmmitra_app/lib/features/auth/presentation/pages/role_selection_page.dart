@@ -2,6 +2,7 @@ import 'package:farmmitra_app/config/routing/app_routes.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/user_role.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:farmmitra_app/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:farmmitra_app/shared/widgets/voice_instruction_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -21,10 +22,23 @@ class RoleSelectionPage extends ConsumerWidget {
             'FarmMitra will personalize jobs, permissions, and profile setup based on your role.',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
-          const SizedBox(height: 20),
-          _RoleOption(role: UserRole.farmer, icon: Icons.agriculture),
           const SizedBox(height: 12),
-          _RoleOption(role: UserRole.worker, icon: Icons.engineering),
+          const VoiceInstructionButton(
+            instruction:
+                'Choose Farmer if you want workers for your farm. Choose Worker if you want farm jobs near you.',
+          ),
+          const SizedBox(height: 20),
+          _RoleOption(
+            role: UserRole.farmer,
+            icon: Icons.agriculture,
+            helperText: 'Post work, set wages, and manage applicants.',
+          ),
+          const SizedBox(height: 14),
+          _RoleOption(
+            role: UserRole.worker,
+            icon: Icons.engineering,
+            helperText: 'Find nearby jobs, apply, and track your work.',
+          ),
           const SizedBox(height: 20),
           const _PreviousAccounts(),
         ],
@@ -34,10 +48,15 @@ class RoleSelectionPage extends ConsumerWidget {
 }
 
 class _RoleOption extends ConsumerWidget {
-  const _RoleOption({required this.role, required this.icon});
+  const _RoleOption({
+    required this.role,
+    required this.icon,
+    required this.helperText,
+  });
 
   final UserRole role;
   final IconData icon;
+  final String helperText;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,15 +72,16 @@ class _RoleOption extends ConsumerWidget {
           }
         },
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           child: Row(
             children: [
               CircleAvatar(
+                radius: 30,
                 backgroundColor: scheme.secondaryContainer,
                 foregroundColor: scheme.onSecondaryContainer,
-                child: Icon(icon),
+                child: Icon(icon, size: 32),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,8 +92,8 @@ class _RoleOption extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      role.description,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      helperText,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),
                     ),
@@ -115,15 +135,18 @@ class _PreviousAccounts extends ConsumerWidget {
               runSpacing: 8,
               children: [
                 for (final account in items)
-                  Chip(
-                    avatar: Icon(
-                      account.role == UserRole.farmer
-                          ? Icons.agriculture
-                          : Icons.engineering,
-                      size: 18,
-                    ),
+                  ActionChip(
+                    avatar: Icon(_iconForRole(account.role), size: 18),
                     label: Text('${account.role.label} ${account.phoneNumber}'),
                     visualDensity: VisualDensity.compact,
+                    onPressed: () async {
+                      final switched = await ref
+                          .read(authControllerProvider.notifier)
+                          .switchToAccount(account);
+                      if (context.mounted && switched) {
+                        context.go(AppRoutes.home);
+                      }
+                    },
                   ),
               ],
             ),
@@ -133,5 +156,9 @@ class _PreviousAccounts extends ConsumerWidget {
       error: (_, _) => const SizedBox.shrink(),
       loading: () => const SizedBox.shrink(),
     );
+  }
+
+  IconData _iconForRole(UserRole role) {
+    return role == UserRole.farmer ? Icons.agriculture : Icons.engineering;
   }
 }

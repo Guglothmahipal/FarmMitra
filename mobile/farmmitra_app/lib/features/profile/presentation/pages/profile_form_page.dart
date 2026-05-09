@@ -7,7 +7,10 @@ import 'package:farmmitra_app/features/profile/presentation/providers/profile_pr
 import 'package:farmmitra_app/features/profile/presentation/widgets/profile_section_card.dart';
 import 'package:farmmitra_app/features/profile/presentation/widgets/profile_text_form_field.dart';
 import 'package:farmmitra_app/shared/widgets/app_error_message.dart';
+import 'package:farmmitra_app/shared/widgets/app_loading_view.dart';
+import 'package:farmmitra_app/shared/widgets/app_page_scaffold.dart';
 import 'package:farmmitra_app/shared/widgets/app_primary_button.dart';
+import 'package:farmmitra_app/shared/widgets/sync_visibility_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -61,131 +64,134 @@ class _ProfileFormPageState extends ConsumerState<ProfileFormPage> {
     final role = authState.selectedRole;
 
     if (role == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const AppPageScaffold(
+        title: 'Profile',
+        body: AppLoadingView(message: 'Loading profile...'),
+      );
     }
 
     _hydrateOnce(role, authState.phoneNumber);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.isEdit ? 'Edit profile' : 'Complete profile'),
-      ),
-      body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              Text(
-                role == UserRole.farmer
-                    ? 'Tell workers about your farm'
-                    : 'Tell farmers about your work',
-                style: Theme.of(context).textTheme.headlineSmall,
+    return AppPageScaffold(
+      title: widget.isEdit ? 'Edit profile' : 'Complete profile',
+      fallbackRoute: AppRoutes.profile,
+      showBackButton: widget.isEdit,
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            const SyncVisibilityBanner(),
+            const SizedBox(height: 16),
+            Text(
+              role == UserRole.farmer
+                  ? 'Tell workers about your farm'
+                  : 'Tell farmers about your work',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'These details stay available offline and will sync when backend profile APIs are connected.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            ProfileSectionCard(
+              title: 'Basic details',
+              icon: Icons.person_outline,
+              child: Column(
+                children: [
+                  ProfileTextFormField(
+                    controller: _fullNameController,
+                    label: 'Full name',
+                    prefixIcon: Icons.badge_outlined,
+                    validator: _required,
+                  ),
+                  const SizedBox(height: 12),
+                  ProfileTextFormField(
+                    controller: _phoneController,
+                    label: 'Phone number',
+                    prefixIcon: Icons.phone,
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(10),
+                    ],
+                    validator: _phoneValidator,
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                'These details stay available offline and will sync when backend profile APIs are connected.',
-                style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 12),
+            ProfileSectionCard(
+              title: 'Location',
+              icon: Icons.location_on_outlined,
+              child: Column(
+                children: [
+                  ProfileTextFormField(
+                    controller: _villageController,
+                    label: 'Village / town',
+                    validator: _required,
+                  ),
+                  const SizedBox(height: 12),
+                  ProfileTextFormField(
+                    controller: _districtController,
+                    label: 'District',
+                    validator: _required,
+                  ),
+                  const SizedBox(height: 12),
+                  ProfileTextFormField(
+                    controller: _stateController,
+                    label: 'State',
+                    validator: _required,
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: null,
+                    icon: const Icon(Icons.my_location),
+                    label: const Text('GPS location placeholder'),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              ProfileSectionCard(
-                title: 'Basic details',
-                icon: Icons.person_outline,
-                child: Column(
-                  children: [
-                    ProfileTextFormField(
-                      controller: _fullNameController,
-                      label: 'Full name',
-                      prefixIcon: Icons.badge_outlined,
-                      validator: _required,
-                    ),
-                    const SizedBox(height: 12),
-                    ProfileTextFormField(
-                      controller: _phoneController,
-                      label: 'Phone number',
-                      prefixIcon: Icons.phone,
-                      keyboardType: TextInputType.phone,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        LengthLimitingTextInputFormatter(10),
-                      ],
-                      validator: _phoneValidator,
-                    ),
-                  ],
-                ),
+            ),
+            const SizedBox(height: 12),
+            if (role == UserRole.farmer)
+              _FarmerFields(
+                farmTypeController: _farmTypeController,
+                landSizeController: _landSizeController,
+                cropsController: _cropsController,
+              )
+            else
+              _WorkerFields(
+                skillsController: _skillsController,
+                experienceController: _experienceController,
+                wageController: _wageController,
+                isAvailable: _isAvailable,
+                onAvailabilityChanged: (value) {
+                  setState(() => _isAvailable = value);
+                },
               ),
+            const SizedBox(height: 12),
+            ProfileSectionCard(
+              title: 'Profile photo',
+              icon: Icons.photo_camera_outlined,
+              child: OutlinedButton.icon(
+                onPressed: null,
+                icon: const Icon(Icons.account_circle_outlined),
+                label: const Text('Photo placeholder'),
+              ),
+            ),
+            if (profileState.errorMessage != null) ...[
               const SizedBox(height: 12),
-              ProfileSectionCard(
-                title: 'Location',
-                icon: Icons.location_on_outlined,
-                child: Column(
-                  children: [
-                    ProfileTextFormField(
-                      controller: _villageController,
-                      label: 'Village / town',
-                      validator: _required,
-                    ),
-                    const SizedBox(height: 12),
-                    ProfileTextFormField(
-                      controller: _districtController,
-                      label: 'District',
-                      validator: _required,
-                    ),
-                    const SizedBox(height: 12),
-                    ProfileTextFormField(
-                      controller: _stateController,
-                      label: 'State',
-                      validator: _required,
-                    ),
-                    const SizedBox(height: 12),
-                    OutlinedButton.icon(
-                      onPressed: null,
-                      icon: const Icon(Icons.my_location),
-                      label: const Text('GPS location placeholder'),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              if (role == UserRole.farmer)
-                _FarmerFields(
-                  farmTypeController: _farmTypeController,
-                  landSizeController: _landSizeController,
-                  cropsController: _cropsController,
-                )
-              else
-                _WorkerFields(
-                  skillsController: _skillsController,
-                  experienceController: _experienceController,
-                  wageController: _wageController,
-                  isAvailable: _isAvailable,
-                  onAvailabilityChanged: (value) {
-                    setState(() => _isAvailable = value);
-                  },
-                ),
-              const SizedBox(height: 12),
-              ProfileSectionCard(
-                title: 'Profile photo',
-                icon: Icons.photo_camera_outlined,
-                child: OutlinedButton.icon(
-                  onPressed: null,
-                  icon: const Icon(Icons.account_circle_outlined),
-                  label: const Text('Photo placeholder'),
-                ),
-              ),
-              if (profileState.errorMessage != null) ...[
-                const SizedBox(height: 12),
-                AppErrorMessage(message: profileState.errorMessage!),
-              ],
-              const SizedBox(height: 20),
-              AppPrimaryButton(
-                label: widget.isEdit ? 'Save changes' : 'Save profile',
-                icon: Icons.save_outlined,
-                isLoading: profileState.isSaving,
-                onPressed: _save,
-              ),
+              AppErrorMessage(message: profileState.errorMessage!),
             ],
-          ),
+            const SizedBox(height: 20),
+            AppPrimaryButton(
+              label: widget.isEdit ? 'Save changes' : 'Save profile',
+              icon: Icons.save_outlined,
+              isLoading: profileState.isSaving,
+              onPressed: _save,
+            ),
+          ],
         ),
       ),
     );

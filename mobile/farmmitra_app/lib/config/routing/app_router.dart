@@ -1,4 +1,5 @@
 import 'package:farmmitra_app/config/routing/app_routes.dart';
+import 'package:farmmitra_app/config/localization/language_controller.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_state.dart';
 import 'package:farmmitra_app/features/auth/presentation/pages/onboarding_page.dart';
@@ -16,6 +17,8 @@ import 'package:farmmitra_app/features/profile/presentation/controllers/profile_
 import 'package:farmmitra_app/features/profile/presentation/pages/profile_dashboard_page.dart';
 import 'package:farmmitra_app/features/profile/presentation/pages/profile_form_page.dart';
 import 'package:farmmitra_app/features/profile/presentation/providers/profile_providers.dart';
+import 'package:farmmitra_app/features/settings/presentation/pages/language_selection_page.dart';
+import 'package:farmmitra_app/features/settings/presentation/pages/settings_page.dart';
 import 'package:farmmitra_app/features/settings/presentation/pages/simple_info_page.dart';
 import 'package:farmmitra_app/features/sync_status/presentation/pages/sync_status_page.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +30,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   ref.listen(authControllerProvider, (_, _) => refreshNotifier.refresh());
   ref.listen(profileControllerProvider, (_, _) => refreshNotifier.refresh());
+  ref.listen(languageControllerProvider, (_, _) => refreshNotifier.refresh());
   ref.onDispose(refreshNotifier.dispose);
 
   return GoRouter(
@@ -34,10 +38,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     refreshListenable: refreshNotifier,
     redirect: (context, state) {
       final authState = ref.read(authControllerProvider);
+      final languageState = ref.read(languageControllerProvider);
       final location = state.uri.path;
 
-      if (authState.status == AuthStatus.checking) {
+      if (authState.status == AuthStatus.checking || languageState.isChecking) {
         return location == AppRoutes.splash ? null : AppRoutes.splash;
+      }
+
+      if (!languageState.hasSelectedLanguage) {
+        return location == AppRoutes.languageSelection
+            ? null
+            : AppRoutes.languageSelection;
       }
 
       if (!authState.onboardingCompleted) {
@@ -99,6 +110,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.onboarding,
         name: AppRouteNames.onboarding,
         builder: (context, state) => const OnboardingPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.languageSelection,
+        name: AppRouteNames.languageSelection,
+        builder: (context, state) =>
+            const LanguageSelectionPage(isInitialSelection: true),
       ),
       GoRoute(
         path: AppRoutes.roleSelection,
@@ -175,12 +192,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.settings,
         name: AppRouteNames.settings,
-        builder: (context, state) => const SimpleInfoPage(
-          title: 'Settings',
-          message:
-              'Language, account, and offline preferences will appear here.',
-          icon: Icons.settings_outlined,
-        ),
+        builder: (context, state) => const SettingsPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.language,
+        name: AppRouteNames.language,
+        builder: (context, state) => const LanguageSelectionPage(),
       ),
       GoRoute(
         path: AppRoutes.support,
@@ -237,6 +254,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 const _authOnlyRoutes = {
   AppRoutes.splash,
   AppRoutes.onboarding,
+  AppRoutes.languageSelection,
   AppRoutes.roleSelection,
   AppRoutes.phoneLogin,
   AppRoutes.otpVerify,

@@ -3,6 +3,7 @@ final class AppRoutes {
 
   static const splash = '/splash';
   static const onboarding = '/onboarding';
+  static const languageSelection = '/language-selection';
   static const roleSelection = '/role-selection';
   static const phoneLogin = '/auth/phone';
   static const otpVerify = '/auth/otp';
@@ -17,6 +18,7 @@ final class AppRoutes {
   static const notifications = '/notifications';
   static const syncStatus = '/sync-status';
   static const settings = '/settings';
+  static const language = '/settings/language';
   static const support = '/support';
   static const faq = '/faq';
   static const about = '/about';
@@ -30,6 +32,7 @@ final class AppRouteNames {
 
   static const splash = 'splash';
   static const onboarding = 'onboarding';
+  static const languageSelection = 'languageSelection';
   static const roleSelection = 'roleSelection';
   static const phoneLogin = 'phoneLogin';
   static const otpVerify = 'otpVerify';
@@ -44,6 +47,7 @@ final class AppRouteNames {
   static const notifications = 'notifications';
   static const syncStatus = 'syncStatus';
   static const settings = 'settings';
+  static const language = 'language';
   static const support = 'support';
   static const faq = 'faq';
   static const about = 'about';

@@ -12,6 +12,8 @@ final class SecureStorageService {
   static const _activeLocalUserIdKey = 'auth.active_local_user_id';
   static const _activeSessionIdKey = 'auth.active_session_id';
   static const _onboardingCompletedKey = 'onboarding.completed';
+  static const _languageCodeKey = 'settings.language_code';
+  static const _notificationPermissionKey = 'notifications.permission_status';
 
   final FlutterSecureStorage _storage;
 
@@ -56,8 +58,24 @@ final class SecureStorageService {
     return _storage.read(key: _activeSessionIdKey);
   }
 
+  Future<String?> readLanguageCode() {
+    return _storage.read(key: _languageCodeKey);
+  }
+
+  Future<String?> readNotificationPermissionStatus() {
+    return _storage.read(key: _notificationPermissionKey);
+  }
+
   Future<void> saveSelectedRole(String role) {
     return _storage.write(key: _selectedRoleKey, value: role);
+  }
+
+  Future<void> saveLanguageCode(String languageCode) {
+    return _storage.write(key: _languageCodeKey, value: languageCode);
+  }
+
+  Future<void> saveNotificationPermissionStatus(String status) {
+    return _storage.write(key: _notificationPermissionKey, value: status);
   }
 
   Future<void> saveTokens({

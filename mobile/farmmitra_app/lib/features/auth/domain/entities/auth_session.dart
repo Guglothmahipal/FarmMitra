@@ -1,3 +1,4 @@
+import 'package:farmmitra_app/features/auth/domain/entities/auth_method.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/user_role.dart';
 
 final class AuthSession {
@@ -8,6 +9,7 @@ final class AuthSession {
     required this.refreshToken,
     required this.phoneNumber,
     required this.role,
+    this.method = AuthMethod.otp,
   });
 
   final String id;
@@ -16,4 +18,5 @@ final class AuthSession {
   final String refreshToken;
   final String phoneNumber;
   final UserRole role;
+  final AuthMethod method;
 }

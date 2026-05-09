@@ -1,10 +1,11 @@
 import 'package:farmmitra_app/features/auth/domain/entities/user_role.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
-import 'package:farmmitra_app/features/dashboard/presentation/widgets/app_scaffold.dart';
 import 'package:farmmitra_app/features/jobs/domain/entities/farm_job.dart';
 import 'package:farmmitra_app/features/jobs/domain/entities/job_application.dart';
 import 'package:farmmitra_app/features/jobs/presentation/providers/jobs_providers.dart';
 import 'package:farmmitra_app/shared/widgets/app_empty_state.dart';
+import 'package:farmmitra_app/shared/widgets/app_loading_view.dart';
+import 'package:farmmitra_app/shared/widgets/app_page_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,15 +17,20 @@ class ApplicationsPage extends ConsumerWidget {
     final jobsState = ref.watch(jobsControllerProvider);
     final role = ref.watch(authControllerProvider).selectedRole;
 
-    return AppScaffold(
+    return AppPageScaffold(
       title: role == UserRole.farmer ? 'Applicants' : 'Applications',
-      currentTab: role == UserRole.worker ? AppTab.applications : AppTab.jobs,
       body: jobsState.applications.isEmpty
-          ? const AppEmptyState(
-              icon: Icons.fact_check_outlined,
-              title: 'No applications yet',
-              message: 'Applications will appear here when workers apply.',
-            )
+          ? jobsState.isLoading
+                ? const AppLoadingView(message: 'Loading applications...')
+                : AppEmptyState(
+                    icon: Icons.fact_check_outlined,
+                    title: role == UserRole.farmer
+                        ? 'No applicants yet'
+                        : 'No applications yet',
+                    message: role == UserRole.farmer
+                        ? 'When workers apply for your posted jobs, their requests will appear here.'
+                        : 'Apply to a nearby farm job and your request will be saved here, even offline.',
+                  )
           : ListView.separated(
               padding: const EdgeInsets.all(16),
               itemBuilder: (context, index) {

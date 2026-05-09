@@ -4,6 +4,7 @@ import 'package:farmmitra_app/features/jobs/presentation/providers/jobs_provider
 import 'package:farmmitra_app/features/profile/presentation/widgets/profile_section_card.dart';
 import 'package:farmmitra_app/features/profile/presentation/widgets/profile_text_form_field.dart';
 import 'package:farmmitra_app/shared/widgets/app_error_message.dart';
+import 'package:farmmitra_app/shared/widgets/app_page_scaffold.dart';
 import 'package:farmmitra_app/shared/widgets/app_primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -50,116 +51,113 @@ class _JobFormPageState extends ConsumerState<JobFormPage> {
     final jobsState = ref.watch(jobsControllerProvider);
     _hydrateOnce(jobsState.jobs);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.jobId == null ? 'Create Job' : 'Edit Job'),
-      ),
-      body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              ProfileSectionCard(
-                title: 'Work details',
-                icon: Icons.assignment_outlined,
-                child: Column(
-                  children: [
-                    ProfileTextFormField(
-                      controller: _titleController,
-                      label: 'Job title',
-                      hintText: 'Cotton harvesting workers needed',
-                      validator: _required,
-                    ),
-                    const SizedBox(height: 12),
-                    ProfileTextFormField(
-                      controller: _categoryController,
-                      label: 'Category',
-                      hintText: 'Harvesting, sowing, irrigation',
-                      validator: _required,
-                    ),
-                    const SizedBox(height: 12),
-                    ProfileTextFormField(
-                      controller: _descriptionController,
-                      label: 'Description',
-                      hintText: 'Describe timing, work, and any notes',
-                      maxLines: 3,
-                      validator: _required,
-                    ),
-                    const SizedBox(height: 12),
-                    ProfileTextFormField(
-                      controller: _workTypeController,
-                      label: 'Crop / work type',
-                      hintText: 'Harvesting, sowing, irrigation',
-                      validator: _required,
-                    ),
-                    const SizedBox(height: 12),
-                    ProfileTextFormField(
-                      controller: _notesController,
-                      label: 'Notes',
-                      hintText: 'Tools, start time, food, transport',
-                      maxLines: 2,
-                    ),
-                  ],
-                ),
+    return AppPageScaffold(
+      title: widget.jobId == null ? 'Create Job' : 'Edit Job',
+      fallbackRoute: AppRoutes.jobs,
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            ProfileSectionCard(
+              title: 'Work details',
+              icon: Icons.assignment_outlined,
+              child: Column(
+                children: [
+                  ProfileTextFormField(
+                    controller: _titleController,
+                    label: 'Job title',
+                    hintText: 'Cotton harvesting workers needed',
+                    validator: _required,
+                  ),
+                  const SizedBox(height: 12),
+                  ProfileTextFormField(
+                    controller: _categoryController,
+                    label: 'Category',
+                    hintText: 'Harvesting, sowing, irrigation',
+                    validator: _required,
+                  ),
+                  const SizedBox(height: 12),
+                  ProfileTextFormField(
+                    controller: _descriptionController,
+                    label: 'Description',
+                    hintText: 'Describe timing, work, and any notes',
+                    maxLines: 3,
+                    validator: _required,
+                  ),
+                  const SizedBox(height: 12),
+                  ProfileTextFormField(
+                    controller: _workTypeController,
+                    label: 'Crop / work type',
+                    hintText: 'Harvesting, sowing, irrigation',
+                    validator: _required,
+                  ),
+                  const SizedBox(height: 12),
+                  ProfileTextFormField(
+                    controller: _notesController,
+                    label: 'Notes',
+                    hintText: 'Tools, start time, food, transport',
+                    maxLines: 2,
+                  ),
+                ],
               ),
+            ),
+            const SizedBox(height: 12),
+            ProfileSectionCard(
+              title: 'Wage and schedule',
+              icon: Icons.currency_rupee,
+              child: Column(
+                children: [
+                  ProfileTextFormField(
+                    controller: _wageController,
+                    label: 'Daily wage',
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    validator: _positiveInt,
+                  ),
+                  const SizedBox(height: 12),
+                  ProfileTextFormField(
+                    controller: _workersController,
+                    label: 'Workers required',
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    validator: _positiveInt,
+                  ),
+                  const SizedBox(height: 12),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.event),
+                    title: Text(
+                      'Work date: ${_workDate.day}/${_workDate.month}/${_workDate.year}',
+                    ),
+                    trailing: const Icon(Icons.edit_calendar),
+                    onTap: _pickDate,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            ProfileSectionCard(
+              title: 'Location',
+              icon: Icons.location_on_outlined,
+              child: ProfileTextFormField(
+                controller: _locationController,
+                label: 'Village / work location',
+                validator: _required,
+              ),
+            ),
+            if (jobsState.errorMessage != null) ...[
               const SizedBox(height: 12),
-              ProfileSectionCard(
-                title: 'Wage and schedule',
-                icon: Icons.currency_rupee,
-                child: Column(
-                  children: [
-                    ProfileTextFormField(
-                      controller: _wageController,
-                      label: 'Daily wage',
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      validator: _positiveInt,
-                    ),
-                    const SizedBox(height: 12),
-                    ProfileTextFormField(
-                      controller: _workersController,
-                      label: 'Workers required',
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      validator: _positiveInt,
-                    ),
-                    const SizedBox(height: 12),
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.event),
-                      title: Text(
-                        'Work date: ${_workDate.day}/${_workDate.month}/${_workDate.year}',
-                      ),
-                      trailing: const Icon(Icons.edit_calendar),
-                      onTap: _pickDate,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              ProfileSectionCard(
-                title: 'Location',
-                icon: Icons.location_on_outlined,
-                child: ProfileTextFormField(
-                  controller: _locationController,
-                  label: 'Village / work location',
-                  validator: _required,
-                ),
-              ),
-              if (jobsState.errorMessage != null) ...[
-                const SizedBox(height: 12),
-                AppErrorMessage(message: jobsState.errorMessage!),
-              ],
-              const SizedBox(height: 20),
-              AppPrimaryButton(
-                label: widget.jobId == null ? 'Post Job' : 'Save Job',
-                icon: Icons.save_outlined,
-                isLoading: jobsState.isSaving,
-                onPressed: _save,
-              ),
+              AppErrorMessage(message: jobsState.errorMessage!),
             ],
-          ),
+            const SizedBox(height: 20),
+            AppPrimaryButton(
+              label: widget.jobId == null ? 'Post Job' : 'Save Job',
+              icon: Icons.save_outlined,
+              isLoading: jobsState.isSaving,
+              onPressed: _save,
+            ),
+          ],
         ),
       ),
     );

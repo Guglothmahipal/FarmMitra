@@ -92,6 +92,11 @@ class AppNavigationDrawer extends ConsumerWidget {
           route: AppRoutes.settings,
         ),
         _DrawerTile(
+          icon: Icons.translate_outlined,
+          label: 'Change Language',
+          route: AppRoutes.language,
+        ),
+        _DrawerTile(
           icon: Icons.support_agent,
           label: 'Contact Support',
           route: AppRoutes.support,
