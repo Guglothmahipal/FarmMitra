@@ -4,6 +4,10 @@ import 'package:farmmitra_app/features/auth/domain/entities/local_account.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/user_role.dart';
 import 'package:farmmitra_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
+import 'package:farmmitra_app/features/jobs/domain/entities/farm_job.dart';
+import 'package:farmmitra_app/features/jobs/domain/entities/job_application.dart';
+import 'package:farmmitra_app/features/jobs/domain/repositories/jobs_repository.dart';
+import 'package:farmmitra_app/features/jobs/presentation/providers/jobs_providers.dart';
 import 'package:farmmitra_app/features/profile/domain/entities/farmer_profile.dart';
 import 'package:farmmitra_app/features/profile/domain/entities/profile_snapshot.dart';
 import 'package:farmmitra_app/features/profile/domain/entities/worker_profile.dart';
@@ -23,6 +27,7 @@ void main() {
             (ref) => _AuthenticatedAuthRepo(),
           ),
           profileRepositoryProvider.overrideWith((ref) => _ProfileRepo()),
+          jobsRepositoryProvider.overrideWith((ref) => _JobsRepo()),
         ],
         child: const FarmMitraApp(),
       ),
@@ -31,8 +36,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('FarmMitra'), findsOneWidget);
-    expect(find.text('Farm details'), findsOneWidget);
-    expect(find.text('Future jobs'), findsOneWidget);
+    expect(find.text('Create Job'), findsOneWidget);
+    expect(find.text('Active jobs'), findsOneWidget);
   });
 }
 
@@ -120,4 +125,56 @@ final class _ProfileRepo implements ProfileRepository {
 
   @override
   Future<void> saveWorkerProfile(WorkerProfile profile) async {}
+}
+
+final class _JobsRepo implements JobsRepository {
+  @override
+  Future<List<FarmJob>> readJobs() async => const [];
+
+  @override
+  Future<List<FarmJob>> readFarmerJobs(String farmerLocalUserId) async =>
+      const [];
+
+  @override
+  Future<FarmJob?> readJob(String jobId) async => null;
+
+  @override
+  Future<void> saveJob(FarmJob job) async {}
+
+  @override
+  Future<void> updateJobStatus({
+    required String jobId,
+    required JobStatus status,
+  }) async {}
+
+  @override
+  Future<List<JobApplication>> readWorkerApplications(
+    String workerLocalUserId,
+  ) async {
+    return const [];
+  }
+
+  @override
+  Future<List<JobApplication>> readFarmerApplications(
+    String farmerLocalUserId,
+  ) async {
+    return const [];
+  }
+
+  @override
+  Future<JobApplication?> readApplicationForJob({
+    required String jobId,
+    required String workerLocalUserId,
+  }) async {
+    return null;
+  }
+
+  @override
+  Future<void> saveApplication(JobApplication application) async {}
+
+  @override
+  Future<void> updateApplicationStatus({
+    required String applicationId,
+    required JobApplicationStatus status,
+  }) async {}
 }

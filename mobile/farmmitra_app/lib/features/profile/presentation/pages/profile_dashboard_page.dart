@@ -1,7 +1,6 @@
 import 'package:farmmitra_app/config/routing/app_routes.dart';
-import 'package:farmmitra_app/core/constants/app_constants.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/user_role.dart';
-import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
+import 'package:farmmitra_app/features/dashboard/presentation/widgets/app_scaffold.dart';
 import 'package:farmmitra_app/features/profile/domain/entities/farmer_profile.dart';
 import 'package:farmmitra_app/features/profile/domain/entities/profile_snapshot.dart';
 import 'package:farmmitra_app/features/profile/domain/entities/worker_profile.dart';
@@ -23,27 +22,19 @@ class ProfileDashboardPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profileState = ref.watch(profileControllerProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppConstants.appName),
-        actions: [
-          IconButton(
-            tooltip: 'Edit profile',
-            onPressed: profileState.hasCompletedProfile
-                ? () => context.go(AppRoutes.profileEdit)
-                : null,
-            icon: const Icon(Icons.edit_outlined),
-          ),
-          IconButton(
-            tooltip: 'Sign out',
-            onPressed: () {
-              ref.read(authControllerProvider.notifier).signOut();
-            },
-            icon: const Icon(Icons.logout),
-          ),
-        ],
-      ),
-      body: SafeArea(child: _DashboardBody(profileState: profileState)),
+    return AppScaffold(
+      title: 'My Profile',
+      currentTab: AppTab.profile,
+      actions: [
+        IconButton(
+          tooltip: 'Edit profile',
+          onPressed: profileState.hasCompletedProfile
+              ? () => context.go(AppRoutes.profileEdit)
+              : null,
+          icon: const Icon(Icons.edit_outlined),
+        ),
+      ],
+      body: _DashboardBody(profileState: profileState),
     );
   }
 }

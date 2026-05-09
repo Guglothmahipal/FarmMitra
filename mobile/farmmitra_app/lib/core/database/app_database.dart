@@ -101,6 +101,68 @@ class WorkerProfiles extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+class Jobs extends Table {
+  TextColumn get id => text()();
+  TextColumn get farmerLocalUserId => text().references(LocalUsers, #id)();
+  TextColumn get title => text()();
+  TextColumn get category => text().withDefault(const Constant('General'))();
+  TextColumn get description => text()();
+  TextColumn get workType => text()();
+  TextColumn get notes => text().nullable()();
+  IntColumn get wage => integer()();
+  IntColumn get workersRequired => integer()();
+  DateTimeColumn get workDate => dateTime()();
+  TextColumn get location => text()();
+  TextColumn get status => text()();
+  TextColumn get syncStatus => text().withDefault(const Constant('pending'))();
+  BoolColumn get needsSync => boolean().withDefault(const Constant(true))();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+class JobApplications extends Table {
+  TextColumn get id => text()();
+  TextColumn get jobId => text().references(Jobs, #id)();
+  TextColumn get workerLocalUserId => text().references(LocalUsers, #id)();
+  TextColumn get status => text()();
+  TextColumn get message => text().nullable()();
+  TextColumn get syncStatus => text().withDefault(const Constant('pending'))();
+  BoolColumn get needsSync => boolean().withDefault(const Constant(true))();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+class SavedJobs extends Table {
+  TextColumn get id => text()();
+  TextColumn get jobId => text().references(Jobs, #id)();
+  TextColumn get workerLocalUserId => text().references(LocalUsers, #id)();
+  BoolColumn get needsSync => boolean().withDefault(const Constant(true))();
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+class LocalNotifications extends Table {
+  TextColumn get id => text()();
+  TextColumn get localUserId => text().references(LocalUsers, #id)();
+  TextColumn get type => text()();
+  TextColumn get title => text()();
+  TextColumn get body => text()();
+  BoolColumn get isRead => boolean().withDefault(const Constant(false))();
+  TextColumn get syncStatus => text().withDefault(const Constant('pending'))();
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 @DriftDatabase(
   tables: [
     SyncQueueItems,
@@ -109,13 +171,17 @@ class WorkerProfiles extends Table {
     AuthSessions,
     FarmerProfiles,
     WorkerProfiles,
+    Jobs,
+    JobApplications,
+    SavedJobs,
+    LocalNotifications,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration {
@@ -129,6 +195,19 @@ class AppDatabase extends _$AppDatabase {
         if (from < 3) {
           await migrator.createTable(localUsers);
           await migrator.createTable(authSessions);
+        }
+        if (from < 4) {
+          await migrator.createTable(jobs);
+          await migrator.createTable(jobApplications);
+          await migrator.createTable(savedJobs);
+        }
+        if (from < 5) {
+          await migrator.addColumn(jobs, jobs.category);
+          await migrator.addColumn(jobs, jobs.notes);
+          await migrator.addColumn(jobs, jobs.syncStatus);
+          await migrator.addColumn(jobApplications, jobApplications.message);
+          await migrator.addColumn(jobApplications, jobApplications.syncStatus);
+          await migrator.createTable(localNotifications);
         }
       },
     );

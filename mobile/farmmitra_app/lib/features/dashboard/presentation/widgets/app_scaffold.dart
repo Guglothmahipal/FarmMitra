@@ -1,0 +1,131 @@
+import 'package:farmmitra_app/config/routing/app_routes.dart';
+import 'package:farmmitra_app/features/auth/domain/entities/user_role.dart';
+import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
+import 'package:farmmitra_app/features/dashboard/presentation/widgets/app_navigation_drawer.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+enum AppTab { home, jobs, notifications, applications, profile }
+
+class AppScaffold extends ConsumerWidget {
+  const AppScaffold({
+    required this.title,
+    required this.currentTab,
+    required this.body,
+    this.actions,
+    super.key,
+  });
+
+  final String title;
+  final AppTab currentTab;
+  final Widget body;
+  final List<Widget>? actions;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final role = ref.watch(authControllerProvider).selectedRole;
+    final tabs = _tabsForRole(role);
+    final currentIndex = tabs.indexWhere((tab) => tab.tab == currentTab);
+
+    return Scaffold(
+      drawer: const AppNavigationDrawer(),
+      appBar: AppBar(title: Text(title), actions: actions),
+      body: SafeArea(child: body),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: currentIndex < 0 ? 0 : currentIndex,
+        onDestinationSelected: (index) => context.go(tabs[index].route),
+        destinations: [
+          for (final item in tabs)
+            NavigationDestination(
+              icon: Icon(item.icon),
+              selectedIcon: Icon(item.selectedIcon),
+              label: item.label,
+            ),
+        ],
+      ),
+    );
+  }
+
+  List<_TabItem> _tabsForRole(UserRole? role) {
+    if (role == UserRole.worker) {
+      return const [
+        _TabItem(
+          tab: AppTab.home,
+          label: 'Home',
+          route: AppRoutes.home,
+          icon: Icons.home_outlined,
+          selectedIcon: Icons.home,
+        ),
+        _TabItem(
+          tab: AppTab.jobs,
+          label: 'Jobs',
+          route: AppRoutes.jobs,
+          icon: Icons.work_outline,
+          selectedIcon: Icons.work,
+        ),
+        _TabItem(
+          tab: AppTab.applications,
+          label: 'Applications',
+          route: AppRoutes.applications,
+          icon: Icons.fact_check_outlined,
+          selectedIcon: Icons.fact_check,
+        ),
+        _TabItem(
+          tab: AppTab.profile,
+          label: 'Profile',
+          route: AppRoutes.profile,
+          icon: Icons.account_circle_outlined,
+          selectedIcon: Icons.account_circle,
+        ),
+      ];
+    }
+
+    return const [
+      _TabItem(
+        tab: AppTab.home,
+        label: 'Home',
+        route: AppRoutes.home,
+        icon: Icons.home_outlined,
+        selectedIcon: Icons.home,
+      ),
+      _TabItem(
+        tab: AppTab.jobs,
+        label: 'Jobs',
+        route: AppRoutes.jobs,
+        icon: Icons.assignment_outlined,
+        selectedIcon: Icons.assignment,
+      ),
+      _TabItem(
+        tab: AppTab.notifications,
+        label: 'Alerts',
+        route: AppRoutes.notifications,
+        icon: Icons.notifications_outlined,
+        selectedIcon: Icons.notifications,
+      ),
+      _TabItem(
+        tab: AppTab.profile,
+        label: 'Profile',
+        route: AppRoutes.profile,
+        icon: Icons.account_circle_outlined,
+        selectedIcon: Icons.account_circle,
+      ),
+    ];
+  }
+}
+
+final class _TabItem {
+  const _TabItem({
+    required this.tab,
+    required this.label,
+    required this.route,
+    required this.icon,
+    required this.selectedIcon,
+  });
+
+  final AppTab tab;
+  final String label;
+  final String route;
+  final IconData icon;
+  final IconData selectedIcon;
+}
