@@ -423,7 +423,8 @@ class _AiAssistantCard extends StatelessWidget {
       title: title,
       subtitle: '$subtitle $suggestion',
       icon: Icons.auto_awesome_outlined,
-      voiceInstruction: 'FarmMitra AI and voice help are placeholders for now.',
+      voiceInstruction:
+          'KhetRojgar AI and voice help are placeholders for now.',
       onTap: () {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

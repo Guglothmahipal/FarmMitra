@@ -108,7 +108,7 @@ class AppNavigationDrawer extends ConsumerWidget {
         ),
         _DrawerTile(
           icon: Icons.info_outline,
-          label: 'About FarmMitra',
+          label: 'About KhetRojgar',
           route: AppRoutes.about,
         ),
         _DrawerTile(

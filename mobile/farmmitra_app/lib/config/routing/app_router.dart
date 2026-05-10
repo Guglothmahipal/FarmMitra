@@ -36,6 +36,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   ref.listen(authControllerProvider, (_, _) => refreshNotifier.refresh());
   ref.listen(profileControllerProvider, (_, _) => refreshNotifier.refresh());
   ref.listen(languageControllerProvider, (_, _) => refreshNotifier.refresh());
+  ref.listen(splashMinimumDelayProvider, (_, _) => refreshNotifier.refresh());
   ref.onDispose(refreshNotifier.dispose);
 
   return GoRouter(
@@ -44,7 +45,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final authState = ref.read(authControllerProvider);
       final languageState = ref.read(languageControllerProvider);
+      final splashDelay = ref.read(splashMinimumDelayProvider);
       final location = state.uri.path;
+
+      if (!splashDelay.hasValue) {
+        return location == AppRoutes.splash ? null : AppRoutes.splash;
+      }
 
       if (authState.status == AuthStatus.checking || languageState.isChecking) {
         return location == AppRoutes.splash ? null : AppRoutes.splash;
@@ -254,9 +260,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.about,
         name: AppRouteNames.about,
         builder: (context, state) => const SimpleInfoPage(
-          title: 'About FarmMitra',
+          title: 'About KhetRojgar',
           message:
-              'FarmMitra connects farmers and rural workers with offline-first workflows.',
+              'KhetRojgar connects farmers and rural workers with offline-first workflows.',
           icon: Icons.info_outline,
         ),
       ),
@@ -282,6 +288,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
+});
+
+final splashMinimumDelayProvider = FutureProvider<void>((ref) async {
+  await Future<void>.delayed(const Duration(milliseconds: 2500));
 });
 
 const _authOnlyRoutes = {

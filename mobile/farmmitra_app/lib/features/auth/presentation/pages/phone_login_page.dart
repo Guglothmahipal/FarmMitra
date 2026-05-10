@@ -45,7 +45,7 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
         icon: Icons.phone_android,
         title: 'Verify your number',
         subtitle:
-            'We will send an OTP to continue as ${role?.label ?? 'FarmMitra user'}.',
+            'We will send an OTP to continue as ${role?.label ?? 'KhetRojgar user'}.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

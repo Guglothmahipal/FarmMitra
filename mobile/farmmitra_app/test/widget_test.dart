@@ -45,7 +45,7 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.text('FarmMitra'), findsOneWidget);
+    expect(find.text('KhetRojgar'), findsOneWidget);
     expect(find.text('31 C'), findsOneWidget);
     expect(find.text('Find Workers'), findsOneWidget);
     expect(find.text('Create Job'), findsOneWidget);

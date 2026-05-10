@@ -59,7 +59,7 @@ class _HomeContent extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'FarmMitra is ready for feature modules, offline sync, API integration, and rural-first mobile workflows..Done By Mahipal',
+          'KhetRojgar is ready for feature modules, offline sync, API integration, and rural-first mobile workflows..Done By Mahipal',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         SizedBox(height: spacing),

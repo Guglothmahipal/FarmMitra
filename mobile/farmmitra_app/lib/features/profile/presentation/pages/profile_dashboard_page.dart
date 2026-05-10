@@ -56,7 +56,7 @@ class _DashboardBody extends StatelessWidget {
       return ProfileEmptyState(
         title: 'Complete your profile',
         message:
-            'Add your local details once and FarmMitra can use them for jobs, matching, and future sync.',
+            'Add your local details once and KhetRojgar can use them for jobs, matching, and future sync.',
         action: AppPrimaryButton(
           label: 'Set up profile',
           icon: Icons.account_circle_outlined,
