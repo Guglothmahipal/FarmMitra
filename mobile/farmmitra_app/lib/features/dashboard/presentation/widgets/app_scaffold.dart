@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-enum AppTab { home, jobs, notifications, profile }
+enum AppTab { home, jobs, notifications, profile, workers, updates, market }
 
 class AppScaffold extends ConsumerWidget {
   const AppScaffold({
@@ -114,25 +114,25 @@ class AppScaffold extends ConsumerWidget {
         selectedIcon: Icons.home,
       ),
       _TabItem(
-        tab: AppTab.jobs,
-        label: 'Jobs',
-        route: AppRoutes.jobs,
-        icon: Icons.assignment_outlined,
-        selectedIcon: Icons.assignment,
+        tab: AppTab.workers,
+        label: 'Workers',
+        route: AppRoutes.farmerWorkers,
+        icon: Icons.groups_outlined,
+        selectedIcon: Icons.groups,
       ),
       _TabItem(
-        tab: AppTab.notifications,
-        label: 'Alerts',
-        route: AppRoutes.notifications,
-        icon: Icons.notifications_outlined,
-        selectedIcon: Icons.notifications,
+        tab: AppTab.updates,
+        label: 'Updates',
+        route: AppRoutes.farmerUpdates,
+        icon: Icons.campaign_outlined,
+        selectedIcon: Icons.campaign,
       ),
       _TabItem(
-        tab: AppTab.profile,
-        label: 'Profile',
-        route: AppRoutes.profile,
-        icon: Icons.account_circle_outlined,
-        selectedIcon: Icons.account_circle,
+        tab: AppTab.market,
+        label: 'Market',
+        route: AppRoutes.farmerMarket,
+        icon: Icons.storefront_outlined,
+        selectedIcon: Icons.storefront,
       ),
     ];
   }

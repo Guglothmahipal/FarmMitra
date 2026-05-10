@@ -8,6 +8,11 @@ import 'package:farmmitra_app/features/auth/presentation/pages/phone_login_page.
 import 'package:farmmitra_app/features/auth/presentation/pages/role_selection_page.dart';
 import 'package:farmmitra_app/features/auth/presentation/pages/splash_page.dart';
 import 'package:farmmitra_app/features/dashboard/presentation/pages/dashboard_page.dart';
+import 'package:farmmitra_app/features/farmer/presentation/pages/farmer_market_page.dart';
+import 'package:farmmitra_app/features/farmer/presentation/pages/farmer_tool_detail_page.dart';
+import 'package:farmmitra_app/features/farmer/presentation/pages/farmer_updates_page.dart';
+import 'package:farmmitra_app/features/farmer/presentation/pages/farmer_worker_detail_page.dart';
+import 'package:farmmitra_app/features/farmer/presentation/pages/farmer_workers_page.dart';
 import 'package:farmmitra_app/features/jobs/presentation/pages/applications_page.dart';
 import 'package:farmmitra_app/features/jobs/presentation/pages/job_detail_page.dart';
 import 'package:farmmitra_app/features/jobs/presentation/pages/job_form_page.dart';
@@ -175,6 +180,34 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             JobDetailPage(jobId: state.pathParameters['jobId'] ?? ''),
       ),
       GoRoute(
+        path: AppRoutes.farmerWorkers,
+        name: AppRouteNames.farmerWorkers,
+        builder: (context, state) => const FarmerWorkersPage(),
+      ),
+      GoRoute(
+        path: '${AppRoutes.farmerWorkerDetails}/:workerId',
+        name: AppRouteNames.farmerWorkerDetails,
+        builder: (context, state) => FarmerWorkerDetailPage(
+          workerId: state.pathParameters['workerId'] ?? '',
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.farmerUpdates,
+        name: AppRouteNames.farmerUpdates,
+        builder: (context, state) => const FarmerUpdatesPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.farmerMarket,
+        name: AppRouteNames.farmerMarket,
+        builder: (context, state) => const FarmerMarketPage(),
+      ),
+      GoRoute(
+        path: '${AppRoutes.farmerToolDetails}/:toolId',
+        name: AppRouteNames.farmerToolDetails,
+        builder: (context, state) =>
+            FarmerToolDetailPage(toolId: state.pathParameters['toolId'] ?? ''),
+      ),
+      GoRoute(
         path: AppRoutes.applications,
         name: AppRouteNames.applications,
         builder: (context, state) => const ApplicationsPage(),
@@ -262,7 +295,12 @@ const _authOnlyRoutes = {
 
 bool _isFarmerOnlyRoute(String location) {
   return location == AppRoutes.jobCreate ||
-      location.startsWith('${AppRoutes.jobEdit}/');
+      location.startsWith('${AppRoutes.jobEdit}/') ||
+      location == AppRoutes.farmerWorkers ||
+      location.startsWith('${AppRoutes.farmerWorkerDetails}/') ||
+      location == AppRoutes.farmerUpdates ||
+      location == AppRoutes.farmerMarket ||
+      location.startsWith('${AppRoutes.farmerToolDetails}/');
 }
 
 final class _RouterRefreshNotifier extends ChangeNotifier {

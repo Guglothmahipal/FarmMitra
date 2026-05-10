@@ -46,15 +46,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('FarmMitra'), findsOneWidget);
-    expect(find.text('Active jobs'), findsOneWidget);
-    expect(find.text('Weather and work condition'), findsOneWidget);
+    expect(find.text('Test Village weather'), findsOneWidget);
+    expect(find.text('Find Workers'), findsOneWidget);
+    expect(find.text('Create Job'), findsOneWidget);
 
     await tester.scrollUntilVisible(
-      find.text('Create Job'),
+      find.text('Active jobs'),
       300,
       scrollable: find.byType(Scrollable).first,
     );
-    expect(find.text('Create Job'), findsOneWidget);
+    expect(find.text('Active jobs'), findsOneWidget);
   });
 }
 

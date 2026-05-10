@@ -14,6 +14,11 @@ final class AppRoutes {
   static const jobCreate = '/jobs/create';
   static const jobEdit = '/jobs/edit';
   static const jobDetails = '/jobs/details';
+  static const farmerWorkers = '/farmer/workers';
+  static const farmerWorkerDetails = '/farmer/workers/details';
+  static const farmerUpdates = '/farmer/updates';
+  static const farmerMarket = '/farmer/market';
+  static const farmerToolDetails = '/farmer/tools/details';
   static const applications = '/applications';
   static const notifications = '/notifications';
   static const syncStatus = '/sync-status';
@@ -43,6 +48,11 @@ final class AppRouteNames {
   static const jobCreate = 'jobCreate';
   static const jobEdit = 'jobEdit';
   static const jobDetails = 'jobDetails';
+  static const farmerWorkers = 'farmerWorkers';
+  static const farmerWorkerDetails = 'farmerWorkerDetails';
+  static const farmerUpdates = 'farmerUpdates';
+  static const farmerMarket = 'farmerMarket';
+  static const farmerToolDetails = 'farmerToolDetails';
   static const applications = 'applications';
   static const notifications = 'notifications';
   static const syncStatus = 'syncStatus';
