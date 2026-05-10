@@ -5,6 +5,7 @@ import 'package:farmmitra_app/features/auth/presentation/controllers/auth_provid
 import 'package:farmmitra_app/features/dashboard/presentation/widgets/app_scaffold.dart';
 import 'package:farmmitra_app/features/dashboard/presentation/widgets/dashboard_card.dart';
 import 'package:farmmitra_app/features/dashboard/presentation/widgets/dashboard_metric.dart';
+import 'package:farmmitra_app/features/farmer/presentation/pages/farmer_home_page.dart';
 import 'package:farmmitra_app/features/jobs/presentation/providers/jobs_providers.dart';
 import 'package:farmmitra_app/features/profile/presentation/providers/profile_providers.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class DashboardPage extends ConsumerWidget {
     return AppScaffold(
       title: AppConstants.appName,
       currentTab: AppTab.home,
+      showSyncBanner: role != UserRole.farmer,
       actions: [
         IconButton(
           tooltip: 'My Profile',
@@ -35,7 +37,7 @@ class DashboardPage extends ConsumerWidget {
       ),
       body: role == UserRole.worker
           ? const WorkerDashboardView()
-          : const FarmerDashboardView(),
+          : const FarmerHomePage(),
     );
   }
 
@@ -46,155 +48,6 @@ class DashboardPage extends ConsumerWidget {
           'Ask about weather, labour planning, or crop care. AI backend coming later.',
         ),
         behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-}
-
-class FarmerDashboardView extends ConsumerWidget {
-  const FarmerDashboardView({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final profile = ref.watch(profileControllerProvider).profile?.farmer;
-    final jobsState = ref.watch(jobsControllerProvider);
-    final activeJobs = jobsState.openJobsCount;
-
-    return RefreshIndicator(
-      onRefresh: () => ref.read(jobsControllerProvider.notifier).load(),
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
-        children: [
-          _WelcomeBanner(
-            title: 'Namaste ${profile?.fullName ?? 'Farmer'}',
-            subtitle: 'Farm work, labour planning, alerts, and tools.',
-          ),
-          const SizedBox(height: 14),
-          _WeatherCard(
-            currentDate: '10 May 2026',
-            areaName: profile?.village ?? 'Rampur village',
-            temperature: '31 C',
-            rain: '35%',
-            humidity: '62%',
-            condition: 'Partly cloudy',
-            workCondition: 'Good day for harvesting',
-            suggestion: 'Rain expected this evening. Avoid pesticide spraying.',
-          ),
-          const SizedBox(height: 14),
-          _PrimaryActionGrid(
-            onFindWorkers: () => context.go(AppRoutes.farmerWorkers),
-            onCreateJob: () => context.push(AppRoutes.jobCreate),
-          ),
-          const SizedBox(height: 14),
-          _MetricGrid(
-            children: [
-              DashboardMetric(
-                label: 'Active jobs',
-                value: activeJobs.toString(),
-                icon: Icons.assignment_outlined,
-              ),
-              DashboardMetric(
-                label: 'Nearby workers',
-                value: '18',
-                icon: Icons.groups_outlined,
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          const _SectionHeader(
-            title: "Today's farm alerts",
-            icon: Icons.notifications_active_outlined,
-          ),
-          const _AlertStrip(
-            items: [
-              _ChipItem('Light rain', Icons.water_drop_outlined),
-              _ChipItem('Cotton watch', Icons.grass_outlined),
-              _ChipItem('High labour demand', Icons.trending_up),
-              _ChipItem('Irrigation due', Icons.opacity),
-            ],
-          ),
-          const SizedBox(height: 18),
-          _SectionHeader(
-            title: 'Jobs and labour',
-            icon: Icons.work_outline,
-            actionLabel: 'View Workers',
-            onAction: () => context.go(AppRoutes.farmerWorkers),
-          ),
-          DashboardCard(
-            title: 'Active jobs',
-            subtitle: 'Open, close, or edit your posted labour needs.',
-            icon: Icons.work_outline,
-            trailing: const Icon(Icons.chevron_right),
-            voiceInstruction:
-                'Open active jobs to manage labour work posted by you.',
-            onTap: () => context.go(AppRoutes.jobs),
-          ),
-          const _PreviewList(
-            title: 'Recommended labour',
-            items: [
-              _PreviewItem(
-                icon: Icons.verified_user_outlined,
-                title: 'Ramesh - Cotton harvest',
-                subtitle: 'Rampur - 2 km',
-                tag: 'Verified Worker',
-              ),
-              _PreviewItem(
-                icon: Icons.star_outline,
-                title: 'Lakshmi - Sowing team',
-                subtitle: 'Kothapalli - 4 km',
-                tag: 'Top Rated',
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          FilledButton.icon(
-            onPressed: () => context.go(AppRoutes.farmerWorkers),
-            icon: const Icon(Icons.groups_outlined),
-            label: const Text('View Workers'),
-          ),
-          const SizedBox(height: 18),
-          const _SectionHeader(
-            title: 'Crop and Farm Tools',
-            icon: Icons.agriculture,
-          ),
-          DashboardCard(
-            title: 'Crop summary',
-            subtitle:
-                profile?.preferredCrops.join(', ') ??
-                'Add crops in profile for better suggestions.',
-            icon: Icons.grass_outlined,
-            onTap: () => context.go(AppRoutes.profile),
-          ),
-          _ToolGrid(
-            title: 'Farmer tools',
-            tools: [
-              _ToolItem('Crop planner', Icons.eco_outlined),
-              _ToolItem('Irrigation', Icons.water_outlined),
-              _ToolItem('Labour calculator', Icons.calculate_outlined),
-              _ToolItem('Harvest planner', Icons.event_note_outlined),
-              _ToolItem('Expense tracker', Icons.receipt_long_outlined),
-              _ToolItem('Weather planning', Icons.wb_sunny_outlined),
-            ],
-            onToolTap: (label) => context.push(
-              '${AppRoutes.farmerToolDetails}/${_toolIdFromLabel(label)}',
-            ),
-          ),
-          const SizedBox(height: 18),
-          const _NewsSection(
-            title: 'Market and mandi updates',
-            items: [
-              _NewsItem('Cotton mandi', 'Rs 7,120 / quintal nearby'),
-              _NewsItem('Season tip', 'Prepare labour early for harvest week'),
-              _NewsItem('Crop alert', 'Check leaves after humid mornings'),
-            ],
-          ),
-          const SizedBox(height: 18),
-          const _AiAssistantCard(
-            title: 'Ask FarmMitra AI',
-            subtitle: 'Get farm planning, labour, and crop help later.',
-            suggestion: 'Try: How many workers for cotton harvest?',
-          ),
-        ],
       ),
     );
   }
@@ -376,92 +229,6 @@ class _MetricGrid extends StatelessWidget {
   }
 }
 
-class _PrimaryActionGrid extends StatelessWidget {
-  const _PrimaryActionGrid({
-    required this.onFindWorkers,
-    required this.onCreateJob,
-  });
-
-  final VoidCallback onFindWorkers;
-  final VoidCallback onCreateJob;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _PrimaryActionCard(
-            title: 'Find Workers',
-            subtitle: 'Nearby labour',
-            icon: Icons.groups_outlined,
-            onTap: onFindWorkers,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _PrimaryActionCard(
-            title: 'Create Job',
-            subtitle: 'Post labour need',
-            icon: Icons.add_task_outlined,
-            onTap: onCreateJob,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _PrimaryActionCard extends StatelessWidget {
-  const _PrimaryActionCard({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.onTap,
-  });
-
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return Card(
-      color: scheme.primaryContainer,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(8),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, color: scheme.onPrimaryContainer, size: 30),
-              const SizedBox(height: 12),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: scheme.onPrimaryContainer,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: scheme.onPrimaryContainer,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _SectionHeader extends StatelessWidget {
   const _SectionHeader({
     required this.title,
@@ -496,24 +263,18 @@ class _SectionHeader extends StatelessWidget {
 
 class _WeatherCard extends StatelessWidget {
   const _WeatherCard({
-    this.currentDate,
-    this.areaName,
     required this.temperature,
     required this.rain,
     required this.humidity,
     required this.condition,
     required this.workCondition,
-    this.suggestion,
   });
 
-  final String? currentDate;
-  final String? areaName;
   final String temperature;
   final String rain;
   final String humidity;
   final String condition;
   final String workCondition;
-  final String? suggestion;
 
   @override
   Widget build(BuildContext context) {
@@ -535,9 +296,7 @@ class _WeatherCard extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    areaName == null
-                        ? 'Weather and work condition'
-                        : '$areaName weather',
+                    'Weather and work condition',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
@@ -555,15 +314,6 @@ class _WeatherCard extends StatelessWidget {
                 ),
               ],
             ),
-            if (currentDate != null) ...[
-              const SizedBox(height: 6),
-              Text(
-                currentDate!,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-              ),
-            ],
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
@@ -583,37 +333,6 @@ class _WeatherCard extends StatelessWidget {
                 context,
               ).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
             ),
-            if (suggestion != null) ...[
-              const SizedBox(height: 10),
-              Chip(
-                avatar: const Icon(Icons.tips_and_updates_outlined, size: 16),
-                label: Text(suggestion!),
-                visualDensity: VisualDensity.compact,
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _AlertStrip extends StatelessWidget {
-  const _AlertStrip({required this.items});
-
-  final List<_ChipItem> items;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final item in items)
-              _InfoChip(label: item.label, icon: item.icon),
           ],
         ),
       ),
@@ -650,89 +369,6 @@ class _PreviewList extends StatelessWidget {
                 ),
               ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ToolGrid extends StatelessWidget {
-  const _ToolGrid({required this.title, required this.tools, this.onToolTap});
-
-  final String title;
-  final List<_ToolItem> tools;
-  final ValueChanged<String>? onToolTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: Theme.of(context).textTheme.titleSmall),
-            const SizedBox(height: 10),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 3,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              childAspectRatio: 0.95,
-              children: [
-                for (final tool in tools)
-                  _MiniToolCard(
-                    label: tool.label,
-                    icon: tool.icon,
-                    onTap: onToolTap == null
-                        ? null
-                        : () => onToolTap!(tool.label),
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MiniToolCard extends StatelessWidget {
-  const _MiniToolCard({required this.label, required this.icon, this.onTap});
-
-  final String label;
-  final IconData icon;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(8),
-      onTap: onTap,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          border: Border.all(color: scheme.outlineVariant),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: scheme.primary),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelMedium,
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -845,13 +481,6 @@ class _InfoChip extends StatelessWidget {
   }
 }
 
-class _ChipItem {
-  const _ChipItem(this.label, this.icon);
-
-  final String label;
-  final IconData icon;
-}
-
 class _PreviewItem {
   const _PreviewItem({
     required this.icon,
@@ -866,20 +495,9 @@ class _PreviewItem {
   final String tag;
 }
 
-class _ToolItem {
-  const _ToolItem(this.label, this.icon);
-
-  final String label;
-  final IconData icon;
-}
-
 class _NewsItem {
   const _NewsItem(this.title, this.subtitle);
 
   final String title;
   final String subtitle;
-}
-
-String _toolIdFromLabel(String label) {
-  return label.toLowerCase().replaceAll(' ', '-');
 }

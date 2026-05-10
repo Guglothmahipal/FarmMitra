@@ -2,7 +2,6 @@ import 'package:farmmitra_app/config/routing/app_routes.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/onboarding_controller.dart';
 import 'package:farmmitra_app/shared/widgets/app_primary_button.dart';
-import 'package:farmmitra_app/shared/widgets/voice_instruction_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -19,34 +18,19 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   static const _pages = [
     _OnboardingSlide(
-      icon: Icons.offline_bolt_outlined,
-      title: 'Works in low network',
-      description:
-          'Important profile, job, and application details stay available on this phone.',
-    ),
-    _OnboardingSlide(
-      icon: Icons.location_on_outlined,
-      title: 'Find nearby jobs and workers',
-      description:
-          'Farmers can post village work. Workers can discover local farm jobs.',
+      icon: Icons.agriculture,
+      title: 'Farm work made simple',
+      description: 'Post farm jobs, find local workers and manage work faster.',
     ),
     _OnboardingSlide(
       icon: Icons.wb_sunny_outlined,
-      title: 'Weather alerts ready',
-      description:
-          'Weather and farm planning alerts will connect as the platform grows.',
+      title: 'Weather and mandi updates',
+      description: 'Stay ready for rain, crop alerts and market price changes.',
     ),
     _OnboardingSlide(
-      icon: Icons.translate_outlined,
-      title: 'Local language support',
-      description:
-          'Choose your comfortable language now. More translations will be added step by step.',
-    ),
-    _OnboardingSlide(
-      icon: Icons.volume_up_outlined,
-      title: 'Voice assistance ready',
-      description:
-          'Speaker buttons can guide users who prefer hearing instructions.',
+      icon: Icons.offline_bolt_outlined,
+      title: 'Works even in low network',
+      description: 'Your profile, jobs and applications stay saved locally.',
     ),
   ];
 
@@ -74,16 +58,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           child: Column(
             children: [
               Align(
-                alignment: Alignment.center,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: VoiceInstructionButton(
-                        instruction: _pages[pageIndex].description,
-                      ),
-                    ),
-                    TextButton(onPressed: _finish, child: const Text('Skip')),
-                  ],
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: _finish,
+                  child: const Text('Skip'),
                 ),
               ),
               Expanded(
@@ -105,9 +83,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   (index) => _PageDot(isActive: index == pageIndex),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 22),
               AppPrimaryButton(
-                label: isLastPage ? 'Get started' : 'Next',
+                label: isLastPage ? 'Get Started' : 'Next',
                 icon: isLastPage ? Icons.check : Icons.arrow_forward,
                 onPressed: isLastPage ? _finish : _nextPage,
               ),
@@ -120,7 +98,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   void _nextPage() {
     _pageController.nextPage(
-      duration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 240),
       curve: Curves.easeOut,
     );
   }
@@ -151,27 +129,32 @@ class _OnboardingSlide extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        CircleAvatar(
-          radius: 52,
-          backgroundColor: scheme.primaryContainer,
-          foregroundColor: scheme.onPrimaryContainer,
-          child: Icon(icon, size: 48),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: scheme.primaryContainer,
+            borderRadius: BorderRadius.circular(32),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Icon(icon, size: 76, color: scheme.onPrimaryContainer),
+          ),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 32),
         Text(
           title,
           textAlign: TextAlign.center,
           style: Theme.of(
             context,
-          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
+          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 12),
         Text(
           description,
           textAlign: TextAlign.center,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            color: scheme.onSurfaceVariant,
+            height: 1.35,
+          ),
         ),
       ],
     );
@@ -188,13 +171,13 @@ class _PageDot extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      width: isActive ? 24 : 8,
+      duration: const Duration(milliseconds: 220),
+      width: isActive ? 28 : 8,
       height: 8,
       margin: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
         color: isActive ? scheme.primary : scheme.outlineVariant,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(99),
       ),
     );
   }

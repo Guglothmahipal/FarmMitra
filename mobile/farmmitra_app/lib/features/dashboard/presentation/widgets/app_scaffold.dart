@@ -16,6 +16,7 @@ class AppScaffold extends ConsumerWidget {
     required this.body,
     this.actions,
     this.floatingActionButton,
+    this.showSyncBanner = true,
     super.key,
   });
 
@@ -24,6 +25,7 @@ class AppScaffold extends ConsumerWidget {
   final Widget body;
   final List<Widget>? actions;
   final Widget? floatingActionButton;
+  final bool showSyncBanner;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -42,10 +44,11 @@ class AppScaffold extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(12, 8, 12, 0),
-              child: SyncVisibilityBanner(compact: true),
-            ),
+            if (showSyncBanner)
+              const Padding(
+                padding: EdgeInsets.fromLTRB(12, 8, 12, 0),
+                child: SyncVisibilityBanner(compact: true),
+              ),
             Expanded(
               child: KeyedSubtree(
                 key: PageStorageKey(currentTab.name),

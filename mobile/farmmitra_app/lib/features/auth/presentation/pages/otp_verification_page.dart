@@ -5,7 +5,6 @@ import 'package:farmmitra_app/features/auth/presentation/widgets/auth_scaffold.d
 import 'package:farmmitra_app/shared/widgets/app_error_message.dart';
 import 'package:farmmitra_app/shared/widgets/app_primary_button.dart';
 import 'package:farmmitra_app/shared/widgets/app_text_field.dart';
-import 'package:farmmitra_app/shared/widgets/voice_instruction_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -45,16 +44,10 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
       child: AuthCard(
         icon: Icons.password,
         title: 'Enter OTP',
-        subtitle:
-            'Use any 6-digit code for now. Backend OTP verification will plug into this flow later. Sent to $phoneNumber.',
+        subtitle: 'Enter the 6-digit code sent to $phoneNumber.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const VoiceInstructionButton(
-              instruction:
-                  'Enter any six digit OTP for now. Real OTP checking will be added with the backend.',
-            ),
-            const SizedBox(height: 16),
             AppTextField(
               controller: _otpController,
               label: 'OTP',

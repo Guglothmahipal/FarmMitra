@@ -26,6 +26,8 @@ class FarmerWorkerDetailPage extends StatelessWidget {
           const SizedBox(height: 12),
           _SkillsCard(worker: worker),
           const SizedBox(height: 12),
+          const _ReviewsCard(),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
@@ -94,7 +96,42 @@ class _WorkerHeader extends StatelessWidget {
                 Chip(label: Text(worker.isAvailable ? 'Available' : 'Busy')),
                 if (worker.isVerified) const Chip(label: Text('Verified')),
                 Chip(label: Text('Joined ${worker.joinedDate}')),
+                Chip(label: Text(worker.experience)),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ReviewsCard extends StatelessWidget {
+  const _ReviewsCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Card(
+      child: Padding(
+        padding: EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Recent reviews'),
+            SizedBox(height: 8),
+            ListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.star_outline),
+              title: Text('Reliable and on time'),
+              subtitle: Text('Completed harvesting work neatly.'),
+            ),
+            ListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.verified_outlined),
+              title: Text('Good field experience'),
+              subtitle: Text('Understands local crop work.'),
             ),
           ],
         ),

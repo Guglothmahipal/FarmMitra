@@ -81,10 +81,115 @@ const farmerToolItems = [
   ),
 ];
 
+const farmerCategories = [
+  FarmerCategoryItem('Tools', Icons.handyman_outlined),
+  FarmerCategoryItem('Fertilizers', Icons.science_outlined),
+  FarmerCategoryItem('Pesticides', Icons.health_and_safety_outlined),
+  FarmerCategoryItem('Seeds', Icons.grass_outlined),
+  FarmerCategoryItem('Machinery', Icons.agriculture),
+  FarmerCategoryItem('Crop Care', Icons.eco_outlined),
+  FarmerCategoryItem('Irrigation', Icons.water_drop_outlined),
+];
+
+const nearbyVendors = [
+  FarmerVendorItem(
+    name: 'Sri Seeds Center',
+    category: 'Seeds',
+    distance: '2 km',
+    offer: 'Cotton seeds',
+    icon: Icons.grass_outlined,
+  ),
+  FarmerVendorItem(
+    name: 'GreenGrow Fertilizers',
+    category: 'Fertilizers',
+    distance: '4 km',
+    offer: '5% local deal',
+    icon: Icons.science_outlined,
+  ),
+  FarmerVendorItem(
+    name: 'Tractor Rental Point',
+    category: 'Machinery',
+    distance: '6 km',
+    offer: 'Morning slots',
+    icon: Icons.agriculture,
+  ),
+  FarmerVendorItem(
+    name: 'Irrigation Supplies',
+    category: 'Irrigation',
+    distance: '5 km',
+    offer: 'Drip kits',
+    icon: Icons.water_drop_outlined,
+  ),
+];
+
+const farmerUpdates = [
+  FarmerUpdateItem(
+    group: 'Mandi',
+    title: 'Cotton Rs 7,120/q',
+    message: 'Nearby mandi price steady',
+    icon: Icons.currency_rupee,
+  ),
+  FarmerUpdateItem(
+    group: 'Weather',
+    title: 'Rain after 5 PM',
+    message: 'Avoid pesticide spraying',
+    icon: Icons.wb_sunny_outlined,
+  ),
+  FarmerUpdateItem(
+    group: 'Scheme',
+    title: 'Equipment support',
+    message: 'Subsidy reminder',
+    icon: Icons.account_balance_outlined,
+  ),
+  FarmerUpdateItem(
+    group: 'Crop',
+    title: 'Humidity watch',
+    message: 'Check cotton leaves',
+    icon: Icons.eco_outlined,
+  ),
+];
+
 final class FarmerToolItem {
   const FarmerToolItem(this.id, this.label, this.icon);
 
   final String id;
   final String label;
+  final IconData icon;
+}
+
+final class FarmerCategoryItem {
+  const FarmerCategoryItem(this.label, this.icon);
+
+  final String label;
+  final IconData icon;
+}
+
+final class FarmerVendorItem {
+  const FarmerVendorItem({
+    required this.name,
+    required this.category,
+    required this.distance,
+    required this.offer,
+    required this.icon,
+  });
+
+  final String name;
+  final String category;
+  final String distance;
+  final String offer;
+  final IconData icon;
+}
+
+final class FarmerUpdateItem {
+  const FarmerUpdateItem({
+    required this.group,
+    required this.title,
+    required this.message,
+    required this.icon,
+  });
+
+  final String group;
+  final String title;
+  final String message;
   final IconData icon;
 }

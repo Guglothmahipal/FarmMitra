@@ -6,7 +6,6 @@ import 'package:farmmitra_app/features/auth/presentation/widgets/auth_scaffold.d
 import 'package:farmmitra_app/shared/widgets/app_error_message.dart';
 import 'package:farmmitra_app/shared/widgets/app_primary_button.dart';
 import 'package:farmmitra_app/shared/widgets/app_text_field.dart';
-import 'package:farmmitra_app/shared/widgets/voice_instruction_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -50,11 +49,6 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const VoiceInstructionButton(
-              instruction:
-                  'Enter your ten digit mobile number. You can use any OTP in this demo app.',
-            ),
-            const SizedBox(height: 16),
             AppTextField(
               controller: _phoneController,
               label: 'Mobile number',
@@ -85,8 +79,6 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
               icon: const Icon(Icons.account_circle_outlined),
               label: const Text('Continue with Google'),
             ),
-            const SizedBox(height: 12),
-            const _AuthHelpCard(),
           ],
         ),
       ),
@@ -123,7 +115,7 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Mock Google sign-in for ${role.label}. Real Firebase/Google auth can plug in here later.',
+                      'Continue as ${role.label} with a saved local account.',
                     ),
                     const SizedBox(height: 12),
                     for (final item in items)
@@ -179,23 +171,5 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
     if (sent && mounted) {
       context.go(AppRoutes.otpVerify);
     }
-  }
-}
-
-class _AuthHelpCard extends StatelessWidget {
-  const _AuthHelpCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Card(
-      child: ListTile(
-        dense: true,
-        leading: Icon(Icons.info_outline),
-        title: Text('MVP login'),
-        subtitle: Text(
-          'OTP and Google are mocked locally now. Sessions persist on this device.',
-        ),
-      ),
-    );
   }
 }

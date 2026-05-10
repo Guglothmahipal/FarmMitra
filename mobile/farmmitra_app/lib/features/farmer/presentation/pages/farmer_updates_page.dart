@@ -12,29 +12,37 @@ class FarmerUpdatesPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
         children: const [
-          _UpdateCard(
+          _UpdateGroup(
+            title: 'Mandi Prices',
             icon: Icons.currency_rupee,
-            category: 'Mandi price',
-            title: 'Cotton price steady',
-            subtitle: 'Nearby mandi: Rs 7,120 / quintal',
+            items: [
+              _UpdateItem('Cotton', 'Rs 7,120/q', 'Nearby mandi'),
+              _UpdateItem('Soybean', 'Rs 4,680/q', 'Stable today'),
+            ],
           ),
-          _UpdateCard(
-            icon: Icons.account_balance_outlined,
-            category: 'Government scheme',
-            title: 'Farm equipment support',
-            subtitle: 'Subsidy reminder placeholder for eligible farmers.',
-          ),
-          _UpdateCard(
+          _UpdateGroup(
+            title: 'Weather Alerts',
             icon: Icons.wb_sunny_outlined,
-            category: 'Weather alert',
-            title: 'Rain expected this evening',
-            subtitle: 'Avoid pesticide spraying after 4 PM.',
+            items: [
+              _UpdateItem('Rain warning', 'After 5 PM', 'Avoid spraying'),
+              _UpdateItem('Humidity', '62%', 'Check leaves'),
+            ],
           ),
-          _UpdateCard(
-            icon: Icons.eco_outlined,
-            category: 'Seasonal tip',
-            title: 'Harvest labour demand rising',
-            subtitle: 'Book workers early for the coming week.',
+          _UpdateGroup(
+            title: 'Government Schemes',
+            icon: Icons.account_balance_outlined,
+            items: [
+              _UpdateItem('Equipment support', 'Open', 'Check eligibility'),
+              _UpdateItem('Irrigation subsidy', 'Reminder', 'Documents needed'),
+            ],
+          ),
+          _UpdateGroup(
+            title: 'Pest/Disease Alerts',
+            icon: Icons.health_and_safety_outlined,
+            items: [
+              _UpdateItem('Cotton watch', 'Moderate', 'Inspect plants'),
+              _UpdateItem('Paddy tip', 'Seasonal', 'Drain excess water'),
+            ],
           ),
         ],
       ),
@@ -42,31 +50,55 @@ class FarmerUpdatesPage extends StatelessWidget {
   }
 }
 
-class _UpdateCard extends StatelessWidget {
-  const _UpdateCard({
-    required this.icon,
-    required this.category,
+class _UpdateGroup extends StatelessWidget {
+  const _UpdateGroup({
     required this.title,
-    required this.subtitle,
+    required this.icon,
+    required this.items,
   });
 
-  final IconData icon;
-  final String category;
   final String title;
-  final String subtitle;
+  final IconData icon;
+  final List<_UpdateItem> items;
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: ListTile(
-        leading: CircleAvatar(child: Icon(icon)),
-        title: Text(title),
-        subtitle: Text(subtitle),
-        trailing: Chip(
-          label: Text(category),
-          visualDensity: VisualDensity.compact,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon),
+                const SizedBox(width: 8),
+                Text(title, style: Theme.of(context).textTheme.titleMedium),
+              ],
+            ),
+            const SizedBox(height: 10),
+            for (final item in items)
+              ListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                title: Text(item.title),
+                subtitle: Text(item.subtitle),
+                trailing: Chip(
+                  label: Text(item.tag),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+          ],
         ),
       ),
     );
   }
+}
+
+class _UpdateItem {
+  const _UpdateItem(this.title, this.subtitle, this.tag);
+
+  final String title;
+  final String subtitle;
+  final String tag;
 }

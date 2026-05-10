@@ -10,7 +10,6 @@ import 'package:farmmitra_app/shared/widgets/app_error_message.dart';
 import 'package:farmmitra_app/shared/widgets/app_loading_view.dart';
 import 'package:farmmitra_app/shared/widgets/app_page_scaffold.dart';
 import 'package:farmmitra_app/shared/widgets/app_primary_button.dart';
-import 'package:farmmitra_app/shared/widgets/sync_visibility_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -81,17 +80,15 @@ class _ProfileFormPageState extends ConsumerState<ProfileFormPage> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            const SyncVisibilityBanner(),
-            const SizedBox(height: 16),
             Text(
               role == UserRole.farmer
-                  ? 'Tell workers about your farm'
-                  : 'Tell farmers about your work',
+                  ? 'Complete your farmer profile'
+                  : 'Complete your worker profile',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 8),
             Text(
-              'These details stay available offline and will sync when backend profile APIs are connected.',
+              'Add the basic details needed for jobs, local matching and future sync.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),

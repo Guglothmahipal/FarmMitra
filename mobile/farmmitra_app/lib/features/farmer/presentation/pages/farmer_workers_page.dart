@@ -1,6 +1,7 @@
 import 'package:farmmitra_app/config/routing/app_routes.dart';
 import 'package:farmmitra_app/features/dashboard/presentation/widgets/app_scaffold.dart';
 import 'package:farmmitra_app/features/farmer/domain/entities/farmer_mock_data.dart';
+import 'package:farmmitra_app/features/farmer/presentation/components/farmer_filter_chip.dart';
 import 'package:farmmitra_app/features/farmer/presentation/widgets/farmer_worker_card.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -17,17 +18,7 @@ class FarmerWorkersPage extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
         children: [
           const _WorkerFilters(),
-          const SizedBox(height: 14),
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.assignment_outlined),
-              title: const Text('Job tracking'),
-              subtitle: const Text('Manage posted jobs and applicants.'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.go(AppRoutes.jobs),
-            ),
-          ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 18),
           Text(
             'Nearby workers',
             style: Theme.of(context).textTheme.titleMedium,
@@ -36,11 +27,20 @@ class FarmerWorkersPage extends StatelessWidget {
           for (final worker in mockFarmerWorkers) ...[
             FarmerWorkerCard(
               worker: worker,
-              onTap: () =>
+              onViewProfile: () =>
                   context.push('${AppRoutes.farmerWorkerDetails}/${worker.id}'),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
           ],
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.assignment_outlined),
+              title: const Text('Manage posted jobs'),
+              subtitle: const Text('Open job tracking and applicants.'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.go(AppRoutes.jobs),
+            ),
+          ),
         ],
       ),
     );
@@ -52,66 +52,37 @@ class _WorkerFilters extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const TextField(
+          decoration: InputDecoration(
+            labelText: 'Search workers',
+            prefixIcon: Icon(Icons.search),
+          ),
+        ),
+        const SizedBox(height: 12),
+        const Wrap(
+          spacing: 8,
+          runSpacing: 8,
           children: [
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Search workers',
-                prefixIcon: Icon(Icons.search),
-              ),
+            FarmerFilterChip(
+              label: 'Nearby',
+              icon: Icons.location_on_outlined,
+              selected: true,
             ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    initialValue: '10 km',
-                    decoration: const InputDecoration(labelText: 'Distance'),
-                    items: const [
-                      DropdownMenuItem(value: '5 km', child: Text('5 km')),
-                      DropdownMenuItem(value: '10 km', child: Text('10 km')),
-                      DropdownMenuItem(value: '25 km', child: Text('25 km')),
-                    ],
-                    onChanged: (_) {},
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    initialValue: 'Any skill',
-                    decoration: const InputDecoration(labelText: 'Skill'),
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'Any skill',
-                        child: Text('Any skill'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Harvesting',
-                        child: Text('Harvesting'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Tractor',
-                        child: Text('Tractor'),
-                      ),
-                    ],
-                    onChanged: (_) {},
-                  ),
-                ),
-              ],
+            FarmerFilterChip(label: 'Verified', icon: Icons.verified_outlined),
+            FarmerFilterChip(
+              label: 'Available Today',
+              icon: Icons.event_available_outlined,
             ),
-            const SizedBox(height: 6),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Available and verified only'),
-              value: true,
-              onChanged: (_) {},
-            ),
+            FarmerFilterChip(label: 'Harvesting', icon: Icons.grass_outlined),
+            FarmerFilterChip(label: 'Irrigation', icon: Icons.water_outlined),
+            FarmerFilterChip(label: 'Tractor', icon: Icons.agriculture),
+            FarmerFilterChip(label: 'Experienced', icon: Icons.star_outline),
           ],
         ),
-      ),
+      ],
     );
   }
 }
