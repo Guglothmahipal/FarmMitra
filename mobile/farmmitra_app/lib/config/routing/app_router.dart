@@ -2,7 +2,6 @@ import 'package:farmmitra_app/config/routing/app_routes.dart';
 import 'package:farmmitra_app/config/localization/language_controller.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_state.dart';
-import 'package:farmmitra_app/features/auth/presentation/pages/onboarding_page.dart';
 import 'package:farmmitra_app/features/auth/presentation/pages/otp_verification_page.dart';
 import 'package:farmmitra_app/features/auth/presentation/pages/phone_login_page.dart';
 import 'package:farmmitra_app/features/auth/presentation/pages/role_selection_page.dart';
@@ -18,6 +17,7 @@ import 'package:farmmitra_app/features/jobs/presentation/pages/job_detail_page.d
 import 'package:farmmitra_app/features/jobs/presentation/pages/job_form_page.dart';
 import 'package:farmmitra_app/features/jobs/presentation/pages/jobs_page.dart';
 import 'package:farmmitra_app/features/notifications/presentation/pages/notifications_page.dart';
+import 'package:farmmitra_app/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:farmmitra_app/features/profile/presentation/controllers/profile_state.dart';
 import 'package:farmmitra_app/features/profile/presentation/pages/profile_dashboard_page.dart';
 import 'package:farmmitra_app/features/profile/presentation/pages/profile_form_page.dart';
@@ -291,7 +291,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 });
 
 final splashMinimumDelayProvider = FutureProvider<void>((ref) async {
-  await Future<void>.delayed(const Duration(milliseconds: 2500));
+  await Future<void>.delayed(const Duration(seconds: 3));
 });
 
 const _authOnlyRoutes = {

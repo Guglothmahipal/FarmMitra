@@ -22,43 +22,109 @@ class _LanguageSelectionPageState extends ConsumerState<LanguageSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final savedLanguage = ref.watch(languageControllerProvider).language;
-    final selectedLanguage = _selectedLanguage ?? savedLanguage;
+    final selectedLanguage = _selectedLanguage;
 
     return AppPageScaffold(
       title: widget.isInitialSelection ? 'Choose Language' : 'Change Language',
       showBackButton: !widget.isInitialSelection,
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Column(
         children: [
-          _LanguageHeader(isInitialSelection: widget.isInitialSelection),
-          const SizedBox(height: 16),
-          for (final language in AppLanguage.values) ...[
-            _LanguageCard(
-              language: language,
-              isSelected: selectedLanguage == language,
-              onTap: () => setState(() => _selectedLanguage = language),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+              children: [
+                _LanguageHeader(isInitialSelection: widget.isInitialSelection),
+                const SizedBox(height: 16),
+                for (final language in AppLanguage.values) ...[
+                  _LanguageCard(
+                    language: language,
+                    isSelected: selectedLanguage == language,
+                    onTap: () => setState(() => _selectedLanguage = language),
+                  ),
+                  const SizedBox(height: 10),
+                ],
+              ],
             ),
-            const SizedBox(height: 10),
-          ],
-          const SizedBox(height: 12),
-          if (_selectedLanguage != null || !widget.isInitialSelection)
-            AppPrimaryButton(
-              label: widget.isInitialSelection ? 'Continue' : 'Save Language',
-              icon: Icons.arrow_forward,
-              onPressed: () async {
-                await ref
-                    .read(languageControllerProvider.notifier)
-                    .selectLanguage(selectedLanguage);
-                if (context.mounted && widget.isInitialSelection) {
-                  context.go(AppRoutes.onboarding);
-                } else if (context.mounted) {
-                  context.pop();
-                }
-              },
-            ),
+          ),
+          _BottomLanguageAction(
+            isVisible: selectedLanguage != null,
+            label: widget.isInitialSelection ? 'Continue' : 'Save Language',
+            onPressed: selectedLanguage == null
+                ? null
+                : () async {
+                    await ref
+                        .read(languageControllerProvider.notifier)
+                        .selectLanguage(selectedLanguage);
+                    if (context.mounted && widget.isInitialSelection) {
+                      context.go(AppRoutes.onboarding);
+                    } else if (context.mounted) {
+                      context.pop();
+                    }
+                  },
+          ),
         ],
       ),
+    );
+  }
+}
+
+class _BottomLanguageAction extends StatelessWidget {
+  const _BottomLanguageAction({
+    required this.isVisible,
+    required this.label,
+    required this.onPressed,
+  });
+
+  final bool isVisible;
+  final String label;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 240),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, animation) {
+        final offsetAnimation = Tween<Offset>(
+          begin: const Offset(0, 0.18),
+          end: Offset.zero,
+        ).animate(animation);
+
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(position: offsetAnimation, child: child),
+        );
+      },
+      child: isVisible
+          ? DecoratedBox(
+              key: const ValueKey('language-bottom-action'),
+              decoration: BoxDecoration(
+                color: scheme.surface,
+                border: Border(top: BorderSide(color: scheme.outlineVariant)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.06),
+                    blurRadius: 18,
+                    offset: const Offset(0, -8),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: AppPrimaryButton(
+                    label: label,
+                    icon: Icons.arrow_forward,
+                    onPressed: onPressed,
+                  ),
+                ),
+              ),
+            )
+          : const SizedBox.shrink(key: ValueKey('language-bottom-empty')),
     );
   }
 }

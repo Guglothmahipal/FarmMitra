@@ -73,8 +73,6 @@ class SplashPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 28),
-                  const _SplashLoader(),
                 ],
               ),
             ),
@@ -153,33 +151,6 @@ class _SplashLogo extends StatelessWidget {
             fit: BoxFit.contain,
             filterQuality: FilterQuality.high,
             gaplessPlayback: true,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SplashLoader extends StatelessWidget {
-  const _SplashLoader();
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.black.withValues(alpha: 0.18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: SizedBox.square(
-          dimension: 26,
-          child: CircularProgressIndicator(
-            strokeWidth: 2.4,
-            strokeCap: StrokeCap.round,
-            color: Colors.white.withValues(alpha: 0.88),
-            backgroundColor: Colors.white.withValues(alpha: 0.16),
           ),
         ),
       ),
