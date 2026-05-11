@@ -49,13 +49,7 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
                 top: 8,
                 left: 12,
                 child: IconButton.filledTonal(
-                  onPressed: () {
-                    if (context.canPop()) {
-                      context.pop();
-                    } else {
-                      context.go(AppRoutes.roleSelection);
-                    }
-                  },
+                  onPressed: () => context.go(AppRoutes.roleSelection),
                   icon: const Icon(Icons.arrow_back_rounded),
                 ),
               ),
@@ -249,7 +243,10 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
         .requestOtp(_phoneController.text);
 
     if (sent && mounted) {
-      context.push(AppRoutes.otpVerify);
+      await context.push(AppRoutes.otpVerify);
+      if (mounted) {
+        setState(() => _isOtpSubmitting = false);
+      }
       return;
     }
 

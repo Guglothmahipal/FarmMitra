@@ -73,7 +73,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       }
 
       if (!authState.isAuthenticated) {
-        if (location == AppRoutes.phoneLogin) {
+        if (location == AppRoutes.roleSelection ||
+            location == AppRoutes.phoneLogin) {
           return null;
         }
 
