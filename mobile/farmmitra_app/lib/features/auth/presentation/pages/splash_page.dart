@@ -1,14 +1,48 @@
 import 'dart:ui';
 
 import 'package:farmmitra_app/core/constants/app_constants.dart';
+import 'package:farmmitra_app/features/onboarding/presentation/models/onboarding_slide.dart';
 import 'package:flutter/material.dart';
 
-class SplashPage extends StatelessWidget {
+class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
+  @override
+  State<SplashPage> createState() => _SplashPageState();
+}
+
+class _SplashPageState extends State<SplashPage> {
   static const _backgroundAsset =
       'assets/branding/backgrounds/khetrojgar_splash_background.jpg';
   static const _logoAsset = 'assets/branding/splash/khetrojgar_splash_logo.png';
+  static const _roleHeroAsset = 'assets/onboarding/webp/Choose_Role.webp';
+
+  bool _didPrecache = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_didPrecache) {
+      return;
+    }
+
+    _didPrecache = true;
+    _precacheStartupAssets(context);
+  }
+
+  Future<void> _precacheStartupAssets(BuildContext context) async {
+    final assets = <String>[
+      _backgroundAsset,
+      _roleHeroAsset,
+      for (final slide in onboardingSlides) slide.imageAsset,
+    ];
+
+    await Future.wait(
+      assets.map(
+        (asset) => precacheImage(AssetImage(asset), context).catchError((_) {}),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

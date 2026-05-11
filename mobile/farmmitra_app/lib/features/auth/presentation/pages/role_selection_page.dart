@@ -30,7 +30,7 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage> {
       body: Column(
         children: [
           const WelcomeHeroSection(
-            imageAsset: 'assets/onboarding/choose_role.png',
+            imageAsset: 'assets/onboarding/webp/Choose_Role.webp',
             title: 'KhetRojgar',
             subtitle: 'Choose your role to continue',
           ),

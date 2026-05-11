@@ -13,6 +13,9 @@ class OnboardingSlideView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
+    final cacheWidth = (screenWidth * pixelRatio).round().clamp(720, 1200);
     final progress = pageOffset.abs().clamp(0.0, 1.0);
     final opacity = 1 - (progress * 0.34);
     final scale = 1 - (progress * 0.05);
@@ -36,7 +39,8 @@ class OnboardingSlideView extends StatelessWidget {
               width: double.infinity,
               height: double.infinity,
               fit: BoxFit.cover,
-              filterQuality: FilterQuality.high,
+              cacheWidth: cacheWidth,
+              filterQuality: FilterQuality.medium,
             ),
           ),
         ),

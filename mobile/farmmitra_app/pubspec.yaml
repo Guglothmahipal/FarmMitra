@@ -86,7 +86,7 @@ flutter:
     - assets/branding/logo/
     - assets/branding/splash/
     - assets/l10n/
-    - assets/onboarding/
+    - assets/onboarding/webp/
 
 flutter_launcher_icons:
   android: true

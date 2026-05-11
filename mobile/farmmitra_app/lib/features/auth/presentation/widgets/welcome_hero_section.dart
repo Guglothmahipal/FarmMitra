@@ -15,7 +15,9 @@ class WelcomeHeroSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
+    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
     final height = (size.height * 0.38).clamp(260.0, 340.0);
+    final cacheWidth = (size.width * pixelRatio).round().clamp(720, 1200);
 
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
@@ -42,7 +44,8 @@ class WelcomeHeroSection extends StatelessWidget {
                 imageAsset,
                 fit: BoxFit.cover,
                 alignment: Alignment.center,
-                filterQuality: FilterQuality.high,
+                cacheWidth: cacheWidth,
+                filterQuality: FilterQuality.medium,
               ),
               const DecoratedBox(
                 decoration: BoxDecoration(
