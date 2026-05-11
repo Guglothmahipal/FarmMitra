@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -12,112 +14,200 @@ class OtpInputWidget extends StatefulWidget {
 }
 
 class _OtpInputWidgetState extends State<OtpInputWidget> {
-  late final List<TextEditingController> _controllers;
-  late final List<FocusNode> _focusNodes;
+  late final TextEditingController _controller;
+  late final FocusNode _focusNode;
+  Timer? _cursorTimer;
+  bool _showCursor = true;
 
   @override
   void initState() {
     super.initState();
-    _controllers = List.generate(6, (_) => TextEditingController());
-    _focusNodes = List.generate(6, (_) => FocusNode());
+    _controller = TextEditingController()..addListener(_handleTextChanged);
+    _focusNode = FocusNode()..addListener(_handleFocusChanged);
   }
 
   @override
   void dispose() {
-    for (final controller in _controllers) {
-      controller.dispose();
-    }
-    for (final node in _focusNodes) {
-      node.dispose();
-    }
+    _cursorTimer?.cancel();
+    _focusNode.dispose();
+    _controller
+      ..removeListener(_handleTextChanged)
+      ..dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: List.generate(6, (index) {
-        return Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(right: index == 5 ? 0 : 7),
-            child: AnimatedBuilder(
-              animation: _focusNodes[index],
-              builder: (context, _) {
-                final hasFocus = _focusNodes[index].hasFocus;
+    final value = _controller.text;
+    final activeIndex = value.length.clamp(0, 5);
 
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.92),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: hasFocus
-                          ? const Color(0xFF3B8350)
-                          : const Color(0xFFD8E0D2),
-                      width: hasFocus ? 1.4 : 1,
-                    ),
-                    boxShadow: [
-                      if (hasFocus)
-                        BoxShadow(
-                          color: const Color(
-                            0xFF2F7D3C,
-                          ).withValues(alpha: 0.10),
-                          blurRadius: 12,
-                          offset: const Offset(0, 5),
-                        ),
-                    ],
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _focusNode.requestFocus,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Row(
+            children: List.generate(6, (index) {
+              final digit = index < value.length ? value[index] : '';
+              final isActive = _focusNode.hasFocus && index == activeIndex;
+
+              return Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(right: index == 5 ? 0 : 8),
+                  child: _OtpBox(
+                    digit: digit,
+                    isActive: isActive,
+                    showCursor: isActive && digit.isEmpty && _showCursor,
+                    onTap: _focusNode.requestFocus,
                   ),
-                  child: TextField(
-                    controller: _controllers[index],
-                    focusNode: _focusNodes[index],
-                    autofocus: index == 0,
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    textInputAction: index == 5
-                        ? TextInputAction.done
-                        : TextInputAction.next,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: const Color(0xFF121B12),
-                      fontWeight: FontWeight.w900,
-                    ),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(1),
-                    ],
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      counterText: '',
-                    ),
-                    onChanged: (value) => _handleChanged(index, value),
-                    onTap: () =>
-                        _controllers[index].selection = TextSelection.collapsed(
-                          offset: _controllers[index].text.length,
-                        ),
-                  ),
-                );
-              },
+                ),
+              );
+            }),
+          ),
+          SizedBox(
+            width: 1,
+            height: 1,
+            child: Opacity(
+              opacity: 0,
+              child: TextField(
+                controller: _controller,
+                focusNode: _focusNode,
+                autofocus: true,
+                keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.done,
+                maxLength: 6,
+                enableInteractiveSelection: false,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(6),
+                ],
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  counterText: '',
+                ),
+              ),
             ),
           ),
-        );
-      }),
+        ],
+      ),
     );
   }
 
-  void _handleChanged(int index, String value) {
-    if (value.isNotEmpty && index < _focusNodes.length - 1) {
-      _focusNodes[index + 1].requestFocus();
+  void _handleFocusChanged() {
+    if (_focusNode.hasFocus) {
+      _startCursorTimer();
+    } else {
+      _cursorTimer?.cancel();
+      _showCursor = false;
     }
 
-    if (value.isEmpty && index > 0) {
-      _focusNodes[index - 1].requestFocus();
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _handleTextChanged() {
+    final sanitized = _controller.text.replaceAll(RegExp(r'[^0-9]'), '');
+    if (sanitized != _controller.text) {
+      _controller.value = TextEditingValue(
+        text: sanitized,
+        selection: TextSelection.collapsed(offset: sanitized.length),
+      );
+      return;
     }
 
-    final otp = _controllers.map((controller) => controller.text).join();
-    widget.onChanged(otp);
-    if (otp.length == 6) {
-      _focusNodes.last.unfocus();
-      widget.onCompleted?.call(otp);
+    widget.onChanged(sanitized);
+    if (sanitized.length == 6) {
+      _focusNode.unfocus();
+      widget.onCompleted?.call(sanitized);
     }
+
+    if (mounted) {
+      setState(() => _showCursor = true);
+    }
+  }
+
+  void _startCursorTimer() {
+    _cursorTimer?.cancel();
+    _showCursor = true;
+    _cursorTimer = Timer.periodic(const Duration(milliseconds: 560), (_) {
+      if (!mounted || !_focusNode.hasFocus) {
+        return;
+      }
+
+      setState(() => _showCursor = !_showCursor);
+    });
+  }
+}
+
+class _OtpBox extends StatelessWidget {
+  const _OtpBox({
+    required this.digit,
+    required this.isActive,
+    required this.showCursor,
+    required this.onTap,
+  });
+
+  final String digit;
+  final bool isActive;
+  final bool showCursor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 170),
+      curve: Curves.easeOutCubic,
+      height: 48,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isActive ? const Color(0xFF3F8752) : const Color(0xFFDADFDC),
+          width: isActive ? 1.35 : 1,
+        ),
+        boxShadow: [
+          if (isActive)
+            BoxShadow(
+              color: const Color(0xFF2F7D3C).withValues(alpha: 0.045),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          onTap: onTap,
+          child: Center(
+            child: digit.isNotEmpty
+                ? Text(
+                    digit,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: const Color(0xFF121B12),
+                      fontWeight: FontWeight.w800,
+                      height: 1,
+                    ),
+                  )
+                : AnimatedOpacity(
+                    opacity: showCursor ? 1 : 0,
+                    duration: const Duration(milliseconds: 90),
+                    child: Container(
+                      width: 1.4,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2F7D3C),
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                    ),
+                  ),
+          ),
+        ),
+      ),
+    );
   }
 }

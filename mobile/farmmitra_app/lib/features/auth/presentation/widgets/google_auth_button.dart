@@ -68,47 +68,44 @@ class _GoogleAuthButtonState extends State<GoogleAuthButton> {
                 ),
               ),
               child: AnimatedOpacity(
-                opacity: isEnabled ? 1 : 0.58,
+                opacity: widget.onPressed == null && !widget.isLoading
+                    ? 0.58
+                    : 1,
                 duration: const Duration(milliseconds: 180),
-                child: widget.isLoading
-                    ? Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 160),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  child: Row(
+                    key: ValueKey(widget.isLoading),
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (widget.isLoading) ...[
+                        const SizedBox(
+                          width: 15,
+                          height: 15,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                      ] else ...[
+                        const _GoogleMark(),
+                        const SizedBox(width: 12),
+                      ],
+                      Text(
+                        'Continue with Google',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
                               color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0,
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            'Connecting...',
-                            style: Theme.of(context).textTheme.titleSmall
-                                ?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                          ),
-                        ],
-                      )
-                    : Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const _GoogleMark(),
-                          const SizedBox(width: 12),
-                          Text(
-                            'Continue with Google',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0,
-                                ),
-                          ),
-                        ],
                       ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),

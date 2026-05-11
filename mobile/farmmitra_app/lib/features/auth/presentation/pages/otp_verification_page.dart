@@ -53,7 +53,13 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
                 top: 8,
                 left: 12,
                 child: IconButton.filledTonal(
-                  onPressed: () => context.go(AppRoutes.phoneLogin),
+                  onPressed: () {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go(AppRoutes.phoneLogin);
+                    }
+                  },
                   icon: const Icon(Icons.arrow_back_rounded),
                 ),
               ),
@@ -128,7 +134,13 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
                               TextButton(
                                 onPressed: _isVerifying || _isResending
                                     ? null
-                                    : () => context.go(AppRoutes.phoneLogin),
+                                    : () {
+                                        if (context.canPop()) {
+                                          context.pop();
+                                        } else {
+                                          context.go(AppRoutes.phoneLogin);
+                                        }
+                                      },
                                 child: const Text('Change mobile number'),
                               ),
                             ],

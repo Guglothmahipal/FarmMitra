@@ -187,6 +187,16 @@ final class AuthController extends Notifier<AuthState> {
     );
   }
 
+  Future<void> clearActiveSessionKeepRole() async {
+    await _repository.signOut();
+    state = state.copyWith(
+      status: AuthStatus.unauthenticated,
+      clearActiveSession: true,
+      clearPendingPhoneNumber: true,
+      clearError: true,
+    );
+  }
+
   void clearError() {
     state = state.copyWith(clearError: true);
   }

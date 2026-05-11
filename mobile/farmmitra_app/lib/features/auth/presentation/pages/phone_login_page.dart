@@ -49,7 +49,13 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
                 top: 8,
                 left: 12,
                 child: IconButton.filledTonal(
-                  onPressed: () => context.go(AppRoutes.roleSelection),
+                  onPressed: () {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go(AppRoutes.roleSelection);
+                    }
+                  },
                   icon: const Icon(Icons.arrow_back_rounded),
                 ),
               ),
@@ -102,18 +108,14 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
                               const SizedBox(height: 18),
                               _OtpButton(
                                 isLoading: _isOtpSubmitting,
-                                onPressed:
-                                    _isOtpSubmitting || _isGoogleSubmitting
-                                    ? null
-                                    : _submit,
+                                onPressed: _isOtpSubmitting ? null : _submit,
                               ),
                               const SizedBox(height: 15),
                               const _DividerLabel(label: 'or continue with'),
                               const SizedBox(height: 14),
                               GoogleAuthButton(
                                 isLoading: _isGoogleSubmitting,
-                                onPressed:
-                                    _isOtpSubmitting || _isGoogleSubmitting
+                                onPressed: _isGoogleSubmitting
                                     ? null
                                     : _showGoogleMockSheet,
                               ),
@@ -247,7 +249,7 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
         .requestOtp(_phoneController.text);
 
     if (sent && mounted) {
-      context.go(AppRoutes.otpVerify);
+      context.push(AppRoutes.otpVerify);
       return;
     }
 

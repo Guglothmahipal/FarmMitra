@@ -140,7 +140,7 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage> {
   Future<void> _continueWithPhone(UserRole role) async {
     await ref.read(authControllerProvider.notifier).selectRole(role);
     if (mounted) {
-      context.go(AppRoutes.phoneLogin);
+      context.push(AppRoutes.phoneLogin);
     }
   }
 }
