@@ -17,30 +17,38 @@ class OnboardingSlideView extends StatelessWidget {
     final pixelRatio = MediaQuery.devicePixelRatioOf(context);
     final cacheWidth = (screenWidth * pixelRatio).round().clamp(720, 1200);
     final progress = pageOffset.abs().clamp(0.0, 1.0);
-    final opacity = 1 - (progress * 0.34);
-    final scale = 1 - (progress * 0.05);
+    final opacity = 1 - (progress * 0.04);
+    final parallax = pageOffset * -14;
 
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFF6FFF1), Color(0xFFE5F5D9)],
+    return RepaintBoundary(
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFF6FFF1), Color(0xFFE5F5D9)],
+          ),
         ),
-      ),
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: Transform.scale(
-          scale: scale,
-          child: Opacity(
-            opacity: opacity,
-            child: Image.asset(
-              slide.imageAsset,
-              width: double.infinity,
-              height: double.infinity,
-              fit: BoxFit.cover,
-              cacheWidth: cacheWidth,
-              filterQuality: FilterQuality.medium,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ClipRect(
+            child: Opacity(
+              opacity: opacity,
+              child: Transform.translate(
+                offset: Offset(parallax, 0),
+                child: Transform.scale(
+                  scale: 1.04,
+                  child: Image.asset(
+                    slide.imageAsset,
+                    width: double.infinity,
+                    height: double.infinity,
+                    fit: BoxFit.cover,
+                    cacheWidth: cacheWidth,
+                    filterQuality: FilterQuality.medium,
+                    gaplessPlayback: true,
+                  ),
+                ),
+              ),
             ),
           ),
         ),

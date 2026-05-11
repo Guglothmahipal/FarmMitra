@@ -1,8 +1,6 @@
 import 'package:farmmitra_app/config/routing/app_routes.dart';
-import 'package:farmmitra_app/features/auth/domain/entities/mock_google_account.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/user_role.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
-import 'package:farmmitra_app/features/auth/presentation/widgets/auth_social_button.dart';
 import 'package:farmmitra_app/features/auth/presentation/widgets/role_selection_card.dart';
 import 'package:farmmitra_app/features/auth/presentation/widgets/welcome_hero_section.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +19,6 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authControllerProvider);
     final selectedRole = _selectedRole;
     final bottomPadding = MediaQuery.paddingOf(context).bottom;
 
@@ -131,18 +128,7 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _PremiumContinueButton(
-                      isLoading: authState.isSubmitting,
-                      onPressed: authState.isSubmitting
-                          ? null
-                          : () => _continueWithPhone(selectedRole),
-                    ),
-                    const SizedBox(height: 12),
-                    AuthSocialButton(
-                      label: 'Continue with Google',
-                      isLoading: authState.isSubmitting,
-                      onPressed: authState.isSubmitting
-                          ? null
-                          : () => _showGoogleMockSheet(selectedRole),
+                      onPressed: () => _continueWithPhone(selectedRole),
                     ),
                   ],
                 ),
@@ -155,98 +141,6 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage> {
     await ref.read(authControllerProvider.notifier).selectRole(role);
     if (mounted) {
       context.go(AppRoutes.phoneLogin);
-    }
-  }
-
-  Future<void> _showGoogleMockSheet(UserRole role) async {
-    await ref.read(authControllerProvider.notifier).selectRole(role);
-    if (!mounted) {
-      return;
-    }
-
-    final account = await showModalBottomSheet<MockGoogleAccount>(
-      context: context,
-      showDragHandle: true,
-      backgroundColor: const Color(0xFFF8FBF2),
-      builder: (context) => Consumer(
-        builder: (context, ref, _) {
-          final accounts = ref.watch(mockGoogleAccountsProvider(role));
-
-          return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 4, 18, 18),
-              child: accounts.when(
-                data: (items) => Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Choose Google account',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Continue as ${role.label} with a saved local account.',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: const Color(0xFF67705F),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    for (final item in items)
-                      Card(
-                        elevation: 0,
-                        color: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          side: const BorderSide(color: Color(0xFFE2E8DB)),
-                        ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 6,
-                          ),
-                          leading: CircleAvatar(
-                            backgroundColor: const Color(0xFFE6F4DE),
-                            foregroundColor: const Color(0xFF2F7D3C),
-                            child: Text(item.name.substring(0, 1)),
-                          ),
-                          title: Text(
-                            item.name,
-                            style: const TextStyle(fontWeight: FontWeight.w800),
-                          ),
-                          subtitle: Text(item.email),
-                          trailing: const Icon(Icons.chevron_right_rounded),
-                          onTap: () => Navigator.of(context).pop(item),
-                        ),
-                      ),
-                  ],
-                ),
-                error: (_, _) => const ListTile(
-                  leading: Icon(Icons.error_outline),
-                  title: Text('Could not load mock Google accounts'),
-                ),
-                loading: () => const Padding(
-                  padding: EdgeInsets.all(28),
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-
-    if (account == null || !mounted) {
-      return;
-    }
-
-    final signedIn = await ref
-        .read(authControllerProvider.notifier)
-        .continueWithGoogle(account);
-    if (signedIn && mounted) {
-      context.go(AppRoutes.home);
     }
   }
 }
@@ -279,13 +173,9 @@ class _AnimatedRoleCard extends StatelessWidget {
 }
 
 class _PremiumContinueButton extends StatefulWidget {
-  const _PremiumContinueButton({
-    required this.onPressed,
-    required this.isLoading,
-  });
+  const _PremiumContinueButton({required this.onPressed});
 
   final VoidCallback? onPressed;
-  final bool isLoading;
 
   @override
   State<_PremiumContinueButton> createState() => _PremiumContinueButtonState();
@@ -296,7 +186,7 @@ class _PremiumContinueButtonState extends State<_PremiumContinueButton> {
 
   @override
   Widget build(BuildContext context) {
-    final isEnabled = widget.onPressed != null && !widget.isLoading;
+    final isEnabled = widget.onPressed != null;
 
     return AnimatedScale(
       scale: _isPressed ? 0.98 : 1,
@@ -325,34 +215,24 @@ class _PremiumContinueButtonState extends State<_PremiumContinueButton> {
             child: SizedBox(
               height: 58,
               child: Center(
-                child: widget.isLoading
-                    ? const SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.4,
-                          color: Colors.white,
-                        ),
-                      )
-                    : Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Continue',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                          ),
-                          const SizedBox(width: 10),
-                          const Icon(
-                            Icons.arrow_forward_rounded,
-                            color: Colors.white,
-                            size: 22,
-                          ),
-                        ],
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Continue',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
                       ),
+                    ),
+                    const SizedBox(width: 10),
+                    const Icon(
+                      Icons.arrow_forward_rounded,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

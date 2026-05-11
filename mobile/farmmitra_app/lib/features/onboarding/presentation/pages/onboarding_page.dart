@@ -17,11 +17,25 @@ class OnboardingPage extends ConsumerStatefulWidget {
 
 class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   late final PageController _pageController;
+  bool _didPrecache = false;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_didPrecache) {
+      return;
+    }
+
+    _didPrecache = true;
+    for (final slide in onboardingSlides) {
+      precacheImage(AssetImage(slide.imageAsset), context);
+    }
   }
 
   @override
@@ -41,6 +55,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         children: [
           PageView.builder(
             controller: _pageController,
+            allowImplicitScrolling: true,
             itemCount: onboardingSlides.length,
             onPageChanged: (index) {
               ref.read(onboardingPageIndexProvider.notifier).setPage(index);
@@ -116,8 +131,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   void _nextPage() {
     _pageController.nextPage(
-      duration: const Duration(milliseconds: 340),
-      curve: Curves.easeOutCubic,
+      duration: const Duration(milliseconds: 420),
+      curve: Curves.easeInOutCubic,
     );
   }
 

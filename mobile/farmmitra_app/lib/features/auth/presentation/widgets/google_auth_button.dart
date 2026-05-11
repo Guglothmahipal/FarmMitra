@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
 
-class AuthSocialButton extends StatefulWidget {
-  const AuthSocialButton({
-    required this.label,
+class GoogleAuthButton extends StatefulWidget {
+  const GoogleAuthButton({
     required this.onPressed,
     this.isLoading = false,
     super.key,
   });
 
-  final String label;
   final VoidCallback? onPressed;
   final bool isLoading;
 
   @override
-  State<AuthSocialButton> createState() => _AuthSocialButtonState();
+  State<GoogleAuthButton> createState() => _GoogleAuthButtonState();
 }
 
-class _AuthSocialButtonState extends State<AuthSocialButton> {
+class _GoogleAuthButtonState extends State<GoogleAuthButton> {
   bool _isPressed = false;
 
   @override
@@ -35,17 +33,17 @@ class _AuthSocialButtonState extends State<AuthSocialButton> {
             end: Alignment.bottomCenter,
             colors: [Color(0xFF242424), Color(0xFF030303)],
           ),
-          border: Border.all(color: const Color(0xFF343434), width: 1),
+          border: Border.all(color: const Color(0xFF343434)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.34),
-              offset: const Offset(0, 16),
-              blurRadius: 28,
+              color: Colors.black.withValues(alpha: 0.26),
+              offset: const Offset(0, 10),
+              blurRadius: 18,
             ),
             BoxShadow(
-              color: Colors.white.withValues(alpha: 0.16),
+              color: Colors.white.withValues(alpha: 0.10),
               offset: const Offset(0, -1),
-              blurRadius: 8,
+              blurRadius: 6,
             ),
           ],
         ),
@@ -56,7 +54,7 @@ class _AuthSocialButtonState extends State<AuthSocialButton> {
             onTap: isEnabled ? widget.onPressed : null,
             onHighlightChanged: (value) => setState(() => _isPressed = value),
             child: Container(
-              height: 58,
+              height: 54,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(999),
@@ -73,13 +71,27 @@ class _AuthSocialButtonState extends State<AuthSocialButton> {
                 opacity: isEnabled ? 1 : 0.58,
                 duration: const Duration(milliseconds: 180),
                 child: widget.isLoading
-                    ? const SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.4,
-                          color: Colors.white,
-                        ),
+                    ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Connecting...',
+                            style: Theme.of(context).textTheme.titleSmall
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                          ),
+                        ],
                       )
                     : Row(
                         mainAxisSize: MainAxisSize.min,
@@ -87,7 +99,7 @@ class _AuthSocialButtonState extends State<AuthSocialButton> {
                           const _GoogleMark(),
                           const SizedBox(width: 12),
                           Text(
-                            widget.label,
+                            'Continue with Google',
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
                                   color: Colors.white,
@@ -122,8 +134,7 @@ class _GoogleMarkPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final strokeWidth = size.width * 0.18;
-    final rect = Offset.zero & size;
-    final arcRect = rect.deflate(strokeWidth / 2);
+    final arcRect = (Offset.zero & size).deflate(strokeWidth / 2);
 
     Paint segment(Color color) => Paint()
       ..color = color
@@ -131,46 +142,16 @@ class _GoogleMarkPainter extends CustomPainter {
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;
 
-    canvas.drawArc(
-      arcRect,
-      -0.10,
-      1.20,
-      false,
-      segment(const Color(0xFF4285F4)),
-    );
-    canvas.drawArc(
-      arcRect,
-      1.15,
-      1.22,
-      false,
-      segment(const Color(0xFF34A853)),
-    );
-    canvas.drawArc(
-      arcRect,
-      2.42,
-      1.05,
-      false,
-      segment(const Color(0xFFFBBC05)),
-    );
-    canvas.drawArc(
-      arcRect,
-      3.46,
-      1.35,
-      false,
-      segment(const Color(0xFFEA4335)),
-    );
-
-    final bluePaint = Paint()
-      ..color = const Color(0xFF4285F4)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.square;
-
-    canvas.drawLine(
-      Offset(size.width * 0.54, size.height * 0.5),
-      Offset(size.width * 0.92, size.height * 0.5),
-      bluePaint,
-    );
+    canvas
+      ..drawArc(arcRect, -0.10, 1.20, false, segment(const Color(0xFF4285F4)))
+      ..drawArc(arcRect, 1.15, 1.22, false, segment(const Color(0xFF34A853)))
+      ..drawArc(arcRect, 2.42, 1.05, false, segment(const Color(0xFFFBBC05)))
+      ..drawArc(arcRect, 3.46, 1.35, false, segment(const Color(0xFFEA4335)))
+      ..drawLine(
+        Offset(size.width * 0.54, size.height * 0.5),
+        Offset(size.width * 0.92, size.height * 0.5),
+        segment(const Color(0xFF4285F4))..strokeCap = StrokeCap.square,
+      );
   }
 
   @override
