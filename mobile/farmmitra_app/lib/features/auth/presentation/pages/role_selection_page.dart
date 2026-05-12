@@ -82,7 +82,6 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage> {
                     ),
                   ),
                   const SizedBox(height: 18),
-                  const _PreviousAccounts(),
                 ],
               ),
             ),
@@ -256,63 +255,5 @@ class _SelectRoleHint extends StatelessWidget {
         fontWeight: FontWeight.w700,
       ),
     );
-  }
-}
-
-class _PreviousAccounts extends ConsumerWidget {
-  const _PreviousAccounts();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final accounts = ref.watch(localAccountsProvider);
-
-    return accounts.when(
-      data: (items) {
-        if (items.isEmpty) {
-          return const SizedBox.shrink();
-        }
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Recent accounts',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: const Color(0xFF33402F),
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final account in items)
-                  ActionChip(
-                    avatar: Icon(_iconForRole(account.role), size: 18),
-                    label: Text('${account.role.label} ${account.phoneNumber}'),
-                    onPressed: () async {
-                      final switched = await ref
-                          .read(authControllerProvider.notifier)
-                          .switchToAccount(account);
-                      if (context.mounted && switched) {
-                        context.go(AppRoutes.home);
-                      }
-                    },
-                  ),
-              ],
-            ),
-          ],
-        );
-      },
-      error: (_, _) => const SizedBox.shrink(),
-      loading: () => const SizedBox.shrink(),
-    );
-  }
-
-  IconData _iconForRole(UserRole role) {
-    return role == UserRole.farmer
-        ? Icons.agriculture_rounded
-        : Icons.engineering_rounded;
   }
 }

@@ -8,11 +8,12 @@ import 'package:farmmitra_app/features/profile/presentation/widgets/location_act
 import 'package:farmmitra_app/features/profile/presentation/widgets/profile_photo_picker.dart';
 import 'package:farmmitra_app/features/profile/presentation/widgets/profile_section_card.dart';
 import 'package:farmmitra_app/features/profile/presentation/widgets/profile_text_form_field.dart';
+import 'package:farmmitra_app/features/profile/presentation/widgets/verified_phone_field.dart';
+import 'package:farmmitra_app/features/profile/presentation/widgets/worker_skill_selector.dart';
 import 'package:farmmitra_app/shared/widgets/app_error_message.dart';
 import 'package:farmmitra_app/shared/widgets/app_loading_view.dart';
 import 'package:farmmitra_app/shared/widgets/app_page_scaffold.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -30,14 +31,7 @@ class _ProfileFormPageState extends ConsumerState<ProfileFormPage> {
   final _fullNameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _villageController = TextEditingController();
-  final _districtController = TextEditingController();
-  final _stateController = TextEditingController();
-  final _farmTypeController = TextEditingController();
-  final _landSizeController = TextEditingController();
-  final _cropsController = TextEditingController();
-  final _skillsController = TextEditingController();
-  final _experienceController = TextEditingController();
-  final _wageController = TextEditingController();
+  Set<String> _selectedSkills = const {};
   bool _isAvailable = true;
   bool _hydrated = false;
 
@@ -46,14 +40,6 @@ class _ProfileFormPageState extends ConsumerState<ProfileFormPage> {
     _fullNameController.dispose();
     _phoneController.dispose();
     _villageController.dispose();
-    _districtController.dispose();
-    _stateController.dispose();
-    _farmTypeController.dispose();
-    _landSizeController.dispose();
-    _cropsController.dispose();
-    _skillsController.dispose();
-    _experienceController.dispose();
-    _wageController.dispose();
     super.dispose();
   }
 
@@ -108,17 +94,7 @@ class _ProfileFormPageState extends ConsumerState<ProfileFormPage> {
                         validator: _required,
                       ),
                       const SizedBox(height: 10),
-                      ProfileTextFormField(
-                        controller: _phoneController,
-                        label: 'Phone number',
-                        prefixIcon: Icons.phone,
-                        keyboardType: TextInputType.phone,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(10),
-                        ],
-                        validator: _phoneValidator,
-                      ),
+                      VerifiedPhoneField(phoneNumber: _phoneController.text),
                     ],
                   ),
                 ),
@@ -134,39 +110,23 @@ class _ProfileFormPageState extends ConsumerState<ProfileFormPage> {
                         validator: _required,
                       ),
                       const SizedBox(height: 10),
-                      ProfileTextFormField(
-                        controller: _districtController,
-                        label: 'District',
-                        validator: _required,
-                      ),
-                      const SizedBox(height: 10),
-                      ProfileTextFormField(
-                        controller: _stateController,
-                        label: 'State',
-                        validator: _required,
-                      ),
-                      const SizedBox(height: 10),
                       const LocationActionButton(),
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
-                if (role == UserRole.farmer)
-                  _FarmerFields(
-                    farmTypeController: _farmTypeController,
-                    landSizeController: _landSizeController,
-                    cropsController: _cropsController,
-                  )
-                else
+                if (role == UserRole.worker) ...[
+                  const SizedBox(height: 12),
                   _WorkerFields(
-                    skillsController: _skillsController,
-                    experienceController: _experienceController,
-                    wageController: _wageController,
+                    selectedSkills: _selectedSkills,
+                    onSkillsChanged: (skills) {
+                      setState(() => _selectedSkills = skills);
+                    },
                     isAvailable: _isAvailable,
                     onAvailabilityChanged: (value) {
                       setState(() => _isAvailable = value);
                     },
                   ),
+                ],
                 const SizedBox(height: 12),
                 const ProfileSectionCard(
                   title: 'Profile photo',
@@ -238,22 +198,13 @@ class _ProfileFormPageState extends ConsumerState<ProfileFormPage> {
     _fullNameController.text = profile.fullName;
     _phoneController.text = profile.phoneNumber;
     _villageController.text = profile.village;
-    _districtController.text = profile.district;
-    _stateController.text = profile.stateName;
-    _farmTypeController.text = profile.farmType;
-    _landSizeController.text = profile.landSize.toString();
-    _cropsController.text = profile.preferredCrops.join(', ');
   }
 
   void _hydrateWorker(WorkerProfile profile) {
     _fullNameController.text = profile.fullName;
     _phoneController.text = profile.phoneNumber;
     _villageController.text = profile.village;
-    _districtController.text = profile.district;
-    _stateController.text = profile.stateName;
-    _skillsController.text = profile.skills.join(', ');
-    _experienceController.text = profile.yearsOfExperience.toString();
-    _wageController.text = profile.dailyWageExpectation.toString();
+    _selectedSkills = profile.skills.toSet();
     _isAvailable = profile.isAvailable;
   }
 
@@ -274,21 +225,21 @@ class _ProfileFormPageState extends ConsumerState<ProfileFormPage> {
             fullName: _fullNameController.text.trim(),
             phoneNumber: _phoneController.text.trim(),
             village: _villageController.text.trim(),
-            district: _districtController.text.trim(),
-            stateName: _stateController.text.trim(),
-            farmType: _farmTypeController.text.trim(),
-            landSize: double.parse(_landSizeController.text.trim()),
-            preferredCrops: _splitTags(_cropsController.text),
+            district: '',
+            stateName: '',
+            farmType: '',
+            landSize: 0,
+            preferredCrops: const [],
           )
         : await controller.saveWorkerProfile(
             fullName: _fullNameController.text.trim(),
             phoneNumber: _phoneController.text.trim(),
             village: _villageController.text.trim(),
-            district: _districtController.text.trim(),
-            stateName: _stateController.text.trim(),
-            skills: _splitTags(_skillsController.text),
-            yearsOfExperience: int.parse(_experienceController.text.trim()),
-            dailyWageExpectation: int.parse(_wageController.text.trim()),
+            district: '',
+            stateName: '',
+            skills: _selectedSkills.toList(growable: false),
+            yearsOfExperience: 0,
+            dailyWageExpectation: 0,
             isAvailable: _isAvailable,
           );
 
@@ -302,22 +253,6 @@ class _ProfileFormPageState extends ConsumerState<ProfileFormPage> {
       return 'Required';
     }
     return null;
-  }
-
-  String? _phoneValidator(String? value) {
-    final phone = value?.trim() ?? '';
-    if (phone.length != 10) {
-      return 'Enter a 10-digit mobile number';
-    }
-    return null;
-  }
-
-  List<String> _splitTags(String value) {
-    return value
-        .split(',')
-        .map((item) => item.trim())
-        .where((item) => item.isNotEmpty)
-        .toList(growable: false);
   }
 }
 
@@ -378,8 +313,8 @@ class _ProfileSetupHeader extends StatelessWidget {
                   const SizedBox(height: 5),
                   Text(
                     isFarmer
-                        ? 'Set up your farming identity and personalize labour matching.'
-                        : 'Set up your work identity and prepare for nearby job matching.',
+                        ? 'Add the basics now. Farm details can be completed later.'
+                        : 'Add the basics now. Work details can be completed later.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: const Color(0xFF66735F),
                       height: 1.32,
@@ -515,68 +450,16 @@ class _ProfileSaveBarState extends State<_ProfileSaveBar> {
   }
 }
 
-class _FarmerFields extends StatelessWidget {
-  const _FarmerFields({
-    required this.farmTypeController,
-    required this.landSizeController,
-    required this.cropsController,
-  });
-
-  final TextEditingController farmTypeController;
-  final TextEditingController landSizeController;
-  final TextEditingController cropsController;
-
-  @override
-  Widget build(BuildContext context) {
-    return ProfileSectionCard(
-      title: 'Farm details',
-      icon: Icons.grass_outlined,
-      child: Column(
-        children: [
-          ProfileTextFormField(
-            controller: farmTypeController,
-            label: 'Farm type',
-            hintText: 'Irrigated, dryland, mixed',
-            validator: _required,
-          ),
-          const SizedBox(height: 10),
-          ProfileTextFormField(
-            controller: landSizeController,
-            label: 'Land size',
-            hintText: 'Acres',
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-            ],
-            validator: _positiveNumber,
-          ),
-          const SizedBox(height: 10),
-          ProfileTextFormField(
-            controller: cropsController,
-            label: 'Preferred crops',
-            hintText: 'Cotton, wheat, soybean',
-            validator: _required,
-          ),
-          const SizedBox(height: 10),
-          const _SuggestionChips(items: ['Cotton', 'Paddy', 'Wheat']),
-        ],
-      ),
-    );
-  }
-}
-
 class _WorkerFields extends StatelessWidget {
   const _WorkerFields({
-    required this.skillsController,
-    required this.experienceController,
-    required this.wageController,
+    required this.selectedSkills,
+    required this.onSkillsChanged,
     required this.isAvailable,
     required this.onAvailabilityChanged,
   });
 
-  final TextEditingController skillsController;
-  final TextEditingController experienceController;
-  final TextEditingController wageController;
+  final Set<String> selectedSkills;
+  final ValueChanged<Set<String>> onSkillsChanged;
   final bool isAvailable;
   final ValueChanged<bool> onAvailabilityChanged;
 
@@ -587,32 +470,9 @@ class _WorkerFields extends StatelessWidget {
       icon: Icons.handyman_outlined,
       child: Column(
         children: [
-          ProfileTextFormField(
-            controller: skillsController,
-            label: 'Skills',
-            hintText: 'Harvesting, sowing, irrigation',
-            validator: _required,
-          ),
-          const SizedBox(height: 10),
-          ProfileTextFormField(
-            controller: experienceController,
-            label: 'Years of experience',
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            validator: _wholeNumber,
-          ),
-          const SizedBox(height: 10),
-          ProfileTextFormField(
-            controller: wageController,
-            label: 'Daily wage expectation',
-            hintText: 'Rupees per day',
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            validator: _wholeNumber,
-          ),
-          const SizedBox(height: 10),
-          const _SuggestionChips(
-            items: ['Harvesting', 'Irrigation', 'Tractor'],
+          WorkerSkillSelector(
+            selectedSkills: selectedSkills,
+            onChanged: onSkillsChanged,
           ),
           const SizedBox(height: 10),
           DecoratedBox(
@@ -633,59 +493,4 @@ class _WorkerFields extends StatelessWidget {
       ),
     );
   }
-}
-
-class _SuggestionChips extends StatelessWidget {
-  const _SuggestionChips({required this.items});
-
-  final List<String> items;
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 6,
-        children: [
-          for (final item in items)
-            Chip(
-              visualDensity: VisualDensity.compact,
-              side: BorderSide.none,
-              backgroundColor: const Color(0xFFEAF5E2),
-              label: Text(
-                item,
-                style: const TextStyle(
-                  color: Color(0xFF2F7D3C),
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-String? _required(String? value) {
-  if (value == null || value.trim().isEmpty) {
-    return 'Required';
-  }
-  return null;
-}
-
-String? _positiveNumber(String? value) {
-  final number = double.tryParse(value?.trim() ?? '');
-  if (number == null || number <= 0) {
-    return 'Enter a valid number';
-  }
-  return null;
-}
-
-String? _wholeNumber(String? value) {
-  final number = int.tryParse(value?.trim() ?? '');
-  if (number == null || number < 0) {
-    return 'Enter a valid number';
-  }
-  return null;
 }

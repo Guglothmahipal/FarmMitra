@@ -47,7 +47,7 @@ class ProfilePhotoPicker extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Add profile photo',
+                      'Add profile photo (optional)',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: const Color(0xFF172016),
                         fontWeight: FontWeight.w900,
@@ -55,7 +55,7 @@ class ProfilePhotoPicker extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      'Helps build trust with farmers and workers',
+                      'You can add this later from your profile',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: const Color(0xFF66735F),
                       ),
