@@ -208,7 +208,7 @@ class _LanguageCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(_localizedLanguageLabel(context, locale)),
+                    Text(locale.englishLabel),
                   ],
                 ),
               ),
@@ -223,12 +223,4 @@ class _LanguageCard extends StatelessWidget {
     );
   }
 
-  String _localizedLanguageLabel(BuildContext context, AppLocale locale) {
-    final l10n = context.l10n;
-    return switch (locale) {
-      AppLocale.english => l10n.languageEnglish,
-      AppLocale.hindi => l10n.languageHindi,
-      AppLocale.telugu => l10n.languageTelugu,
-    };
-  }
 }
