@@ -1,3 +1,4 @@
+import 'package:farmmitra_app/core/localization/locale_extensions.dart';
 import 'package:flutter/material.dart';
 
 class LocationActionButton extends StatelessWidget {
@@ -12,11 +13,7 @@ class LocationActionButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         onTap: () {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Location capture will be added in the next phase.',
-              ),
-            ),
+            SnackBar(content: Text(context.l10n.profileLocationComingSoon)),
           );
         },
         child: Padding(
@@ -35,7 +32,7 @@ class LocationActionButton extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Use current location',
+                      context.l10n.profileUseCurrentLocation,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w900,
                         color: const Color(0xFF172016),
@@ -43,7 +40,7 @@ class LocationActionButton extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Prepare GPS for nearby matching',
+                      context.l10n.profileLocationComingSoon,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: const Color(0xFF66735F),
                       ),

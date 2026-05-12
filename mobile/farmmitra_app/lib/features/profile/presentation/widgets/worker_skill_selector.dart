@@ -1,3 +1,4 @@
+import 'package:farmmitra_app/core/localization/locale_extensions.dart';
 import 'package:flutter/material.dart';
 
 class WorkerSkillSelector extends StatelessWidget {
@@ -8,12 +9,12 @@ class WorkerSkillSelector extends StatelessWidget {
   });
 
   static const options = [
-    'Harvesting',
-    'Irrigation',
-    'Tractor',
-    'Spraying',
-    'Dairy',
-    'Sowing',
+    'harvesting',
+    'irrigation',
+    'tractor',
+    'spraying',
+    'dairy',
+    'sowing',
   ];
 
   final Set<String> selectedSkills;
@@ -25,7 +26,7 @@ class WorkerSkillSelector extends StatelessWidget {
       initialValue: selectedSkills,
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Select at least one skill';
+          return context.l10n.profileSkillRequired;
         }
         return null;
       },
@@ -34,7 +35,7 @@ class WorkerSkillSelector extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Choose your skills',
+              context.l10n.profileChooseSkills,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: const Color(0xFF182217),
                 fontWeight: FontWeight.w900,
@@ -48,6 +49,7 @@ class WorkerSkillSelector extends StatelessWidget {
                 for (final skill in options)
                   _SkillChip(
                     label: skill,
+                    displayLabel: _skillLabel(context, skill),
                     isSelected: selectedSkills.contains(skill),
                     onTap: () {
                       final updated = {...selectedSkills};
@@ -83,16 +85,31 @@ class WorkerSkillSelector extends StatelessWidget {
       },
     );
   }
+
+  String _skillLabel(BuildContext context, String skill) {
+    final l10n = context.l10n;
+    return switch (skill) {
+      'harvesting' => l10n.skillHarvesting,
+      'irrigation' => l10n.skillIrrigation,
+      'tractor' => l10n.skillTractor,
+      'spraying' => l10n.skillSpraying,
+      'dairy' => l10n.skillDairy,
+      'sowing' => l10n.skillSowing,
+      _ => skill,
+    };
+  }
 }
 
 class _SkillChip extends StatelessWidget {
   const _SkillChip({
     required this.label,
+    required this.displayLabel,
     required this.isSelected,
     required this.onTap,
   });
 
   final String label;
+  final String displayLabel;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -150,7 +167,7 @@ class _SkillChip extends StatelessWidget {
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  label,
+                  displayLabel,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: isSelected ? Colors.white : const Color(0xFF30402D),
                     fontWeight: FontWeight.w800,

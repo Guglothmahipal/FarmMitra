@@ -1,3 +1,4 @@
+import 'package:farmmitra_app/core/localization/locale_extensions.dart';
 import 'package:flutter/material.dart';
 
 class VerifiedPhoneField extends StatelessWidget {
@@ -8,11 +9,11 @@ class VerifiedPhoneField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final displayPhone = phoneNumber.trim().isEmpty
-        ? '+91 verified mobile'
+        ? '+91 ${context.l10n.profileVerifiedMobile}'
         : '+91 ${phoneNumber.trim()}';
 
     return Semantics(
-      label: 'Verified mobile number $displayPhone',
+      label: context.l10n.profileVerifiedMobileA11y(displayPhone),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: const Color(0xFFEFF3EB),
@@ -42,7 +43,7 @@ class VerifiedPhoneField extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Verified mobile',
+                      context.l10n.profileVerifiedMobile,
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: const Color(0xFF64705E),
                         fontWeight: FontWeight.w700,
@@ -75,7 +76,7 @@ class VerifiedPhoneField extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Verified',
+                      context.l10n.profileVerified,
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: const Color(0xFF2F7D3C),
                         fontWeight: FontWeight.w900,

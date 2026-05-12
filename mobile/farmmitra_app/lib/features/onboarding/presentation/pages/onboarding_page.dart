@@ -1,4 +1,5 @@
 import 'package:farmmitra_app/config/routing/app_routes.dart';
+import 'package:farmmitra_app/core/localization/locale_extensions.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:farmmitra_app/features/onboarding/presentation/controllers/onboarding_controller.dart';
 import 'package:farmmitra_app/features/onboarding/presentation/models/onboarding_slide.dart';
@@ -33,8 +34,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     }
 
     _didPrecache = true;
-    for (final slide in onboardingSlides) {
-      precacheImage(AssetImage(slide.imageAsset), context);
+    for (final imageAsset in onboardingImageAssets) {
+      precacheImage(AssetImage(imageAsset), context);
     }
   }
 
@@ -47,8 +48,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   @override
   Widget build(BuildContext context) {
     final pageIndex = ref.watch(onboardingPageIndexProvider);
-    final slide = onboardingSlides[pageIndex];
-    final isLastPage = pageIndex == onboardingSlides.length - 1;
+    final l10n = context.l10n;
+    final slides = buildOnboardingSlides(l10n);
+    final slide = slides[pageIndex];
+    final isLastPage = pageIndex == slides.length - 1;
 
     return Scaffold(
       body: Stack(
@@ -56,7 +59,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           PageView.builder(
             controller: _pageController,
             allowImplicitScrolling: true,
-            itemCount: onboardingSlides.length,
+            itemCount: slides.length,
             onPageChanged: (index) {
               ref.read(onboardingPageIndexProvider.notifier).setPage(index);
             },
@@ -71,7 +74,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                       : pageIndex.toDouble();
 
                   return OnboardingSlideView(
-                    slide: onboardingSlides[index],
+                    slide: slides[index],
                     pageOffset: currentPage - index,
                   );
                 },
@@ -89,7 +92,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                     foregroundColor: const Color(0xFF245E32),
                     textStyle: const TextStyle(fontWeight: FontWeight.w800),
                   ),
-                  child: const Text('Skip'),
+                  child: Text(l10n.commonSkip),
                 ),
               ),
             ),
@@ -116,9 +119,11 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                 key: ValueKey(slide.title),
                 title: slide.title,
                 description: slide.description,
-                pageCount: onboardingSlides.length,
+                pageCount: slides.length,
                 activeIndex: pageIndex,
-                buttonLabel: isLastPage ? 'Get Started' : 'Next',
+                buttonLabel: isLastPage
+                    ? l10n.commonGetStarted
+                    : l10n.commonNext,
                 buttonIcon: isLastPage ? Icons.check : Icons.arrow_forward,
                 onPressed: isLastPage ? _finish : _nextPage,
               ),

@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:farmmitra_app/config/routing/app_routes.dart';
+import 'package:farmmitra_app/core/localization/locale_extensions.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:farmmitra_app/features/auth/presentation/widgets/auth_background.dart';
 import 'package:farmmitra_app/features/auth/presentation/widgets/auth_header.dart';
+import 'package:farmmitra_app/features/auth/presentation/widgets/auth_keyboard_safe_body.dart';
 import 'package:farmmitra_app/features/auth/presentation/widgets/otp_input_widget.dart';
 import 'package:farmmitra_app/shared/widgets/app_error_message.dart';
 import 'package:flutter/material.dart';
@@ -41,121 +43,82 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
     final phoneNumber = authState.pendingPhoneNumber ?? 'your mobile number';
-    final viewInsets = MediaQuery.viewInsetsOf(context);
+    final l10n = context.l10n;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: AuthBackground(
-        child: SafeArea(
-          child: Stack(
-            children: [
-              Positioned(
-                top: 8,
-                left: 12,
-                child: IconButton.filledTonal(
-                  onPressed: () {
-                    if (context.canPop()) {
-                      context.pop();
-                    } else {
-                      context.go(AppRoutes.phoneLogin);
-                    }
-                  },
-                  icon: const Icon(Icons.arrow_back_rounded),
+        child: AuthKeyboardSafeBody(
+          onBack: _goBackToLogin,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: 1),
+            duration: const Duration(milliseconds: 520),
+            curve: Curves.easeOutCubic,
+            builder: (context, value, child) {
+              return Opacity(
+                opacity: value,
+                child: Transform.translate(
+                  offset: Offset(0, 18 * (1 - value)),
+                  child: child,
                 ),
-              ),
-              AnimatedPadding(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
-                padding: EdgeInsets.fromLTRB(
-                  20,
-                  54,
-                  20,
-                  viewInsets.bottom + 18,
-                ),
-                child: Center(
-                  child: SingleChildScrollView(
-                    keyboardDismissBehavior:
-                        ScrollViewKeyboardDismissBehavior.onDrag,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 430),
-                      child: TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0, end: 1),
-                        duration: const Duration(milliseconds: 520),
-                        curve: Curves.easeOutCubic,
-                        builder: (context, value, child) {
-                          return Opacity(
-                            opacity: value,
-                            child: Transform.translate(
-                              offset: Offset(0, 18 * (1 - value)),
-                              child: child,
-                            ),
-                          );
-                        },
-                        child: _AuthCard(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              AuthHeader(
-                                icon: Icons.password_rounded,
-                                title: 'Verify your OTP',
-                                subtitle:
-                                    'Enter the 6-digit code sent to +91 $phoneNumber.',
-                              ),
-                              const SizedBox(height: 22),
-                              OtpInputWidget(
-                                onChanged: (value) {
-                                  setState(() => _otp = value);
-                                },
-                                onCompleted: (_) => _submit(),
-                              ),
-                              if (authState.errorMessage != null) ...[
-                                const SizedBox(height: 12),
-                                AppErrorMessage(
-                                  message: authState.errorMessage!,
-                                ),
-                              ],
-                              const SizedBox(height: 18),
-                              _VerifyButton(
-                                isLoading: _isVerifying,
-                                isEnabled:
-                                    _otp.length == 6 &&
-                                    !_isVerifying &&
-                                    !_isResending,
-                                onPressed: _submit,
-                              ),
-                              const SizedBox(height: 12),
-                              _ResendRow(
-                                secondsRemaining: _secondsRemaining,
-                                isLoading: _isResending,
-                                onResend: _resendOtp,
-                              ),
-                              const SizedBox(height: 2),
-                              TextButton(
-                                onPressed: _isVerifying || _isResending
-                                    ? null
-                                    : () {
-                                        if (context.canPop()) {
-                                          context.pop();
-                                        } else {
-                                          context.go(AppRoutes.phoneLogin);
-                                        }
-                                      },
-                                child: const Text('Change mobile number'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+              );
+            },
+            child: _AuthCard(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  AuthHeader(
+                    icon: Icons.password_rounded,
+                    title: l10n.otpTitle,
+                    subtitle: l10n.otpSubtitle(phoneNumber),
                   ),
-                ),
+                  const SizedBox(height: 22),
+                  OtpInputWidget(
+                    onChanged: (value) {
+                      setState(() => _otp = value);
+                    },
+                    onCompleted: (_) => _submit(),
+                  ),
+                  if (authState.errorMessage != null) ...[
+                    const SizedBox(height: 12),
+                    AppErrorMessage(message: authState.errorMessage!),
+                  ],
+                  const SizedBox(height: 18),
+                  _VerifyButton(
+                    isLoading: _isVerifying,
+                    isEnabled:
+                        _otp.length == 6 && !_isVerifying && !_isResending,
+                    onPressed: _submit,
+                  ),
+                  const SizedBox(height: 12),
+                  _ResendRow(
+                    secondsRemaining: _secondsRemaining,
+                    isLoading: _isResending,
+                    onResend: _resendOtp,
+                  ),
+                  const SizedBox(height: 2),
+                  TextButton(
+                    onPressed: _isVerifying || _isResending
+                        ? null
+                        : _goBackToLogin,
+                    child: Text(l10n.otpChangeMobile),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  void _goBackToLogin() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(AppRoutes.phoneLogin);
+    }
   }
 
   void _startTimer({bool notify = true}) {
@@ -196,7 +159,7 @@ class _OtpVerificationPageState extends ConsumerState<OtpVerificationPage> {
       _startTimer();
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('OTP sent again.')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.otpSentAgain)));
     }
     if (mounted) {
       setState(() => _isResending = false);
@@ -319,7 +282,7 @@ class _VerifyButtonState extends State<_VerifyButton> {
                             ),
                             const SizedBox(width: 10),
                             Text(
-                              'Verifying...',
+                              context.l10n.otpVerifying,
                               style: Theme.of(context).textTheme.titleSmall
                                   ?.copyWith(
                                     color: Colors.white,
@@ -332,7 +295,7 @@ class _VerifyButtonState extends State<_VerifyButton> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Verify and continue',
+                              context.l10n.otpVerifyButton,
                               style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(
                                     color: Colors.white,
@@ -378,8 +341,8 @@ class _ResendRow extends StatelessWidget {
           duration: const Duration(milliseconds: 180),
           child: Text(
             canResend
-                ? 'Did not receive code?'
-                : 'Resend OTP in ${secondsRemaining}s',
+                ? context.l10n.otpResendReady
+                : context.l10n.otpResendIn(secondsRemaining),
             key: ValueKey(canResend ? 'ready' : secondsRemaining),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: const Color(0xFF60695B),
@@ -395,7 +358,7 @@ class _ResendRow extends StatelessWidget {
             foregroundColor: const Color(0xFF2F7D3C),
             disabledForegroundColor: const Color(0xFF9BA596),
           ),
-          child: const Text('Resend OTP'),
+          child: Text(context.l10n.otpResendButton),
         ),
       ],
     );

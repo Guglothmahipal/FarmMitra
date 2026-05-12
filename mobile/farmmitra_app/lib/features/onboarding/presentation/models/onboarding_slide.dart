@@ -1,3 +1,5 @@
+import 'package:farmmitra_app/l10n/app_localizations.dart';
+
 final class OnboardingSlide {
   const OnboardingSlide({
     required this.title,
@@ -10,29 +12,34 @@ final class OnboardingSlide {
   final String imageAsset;
 }
 
-const onboardingSlides = [
-  OnboardingSlide(
-    title: 'Find trusted farm workers',
-    description:
-        'Connect with nearby verified workers for harvesting, irrigation, spraying and daily farm activities.',
-    imageAsset: 'assets/onboarding/webp/Feature_1.webp',
-  ),
-  OnboardingSlide(
-    title: 'Manage farm work in one place',
-    description:
-        'Check weather, post labour jobs, find nearby workers and track responses from your village area.',
-    imageAsset: 'assets/onboarding/webp/Feature_2.webp',
-  ),
-  OnboardingSlide(
-    title: 'Buy farming essentials nearby',
-    description:
-        'Discover fertilizers, pesticides, seeds and tools from nearby agricultural vendors.',
-    imageAsset: 'assets/onboarding/webp/Feature_3.webp',
-  ),
-  OnboardingSlide(
-    title: 'AI help and farming updates',
-    description:
-        'Get AI-ready farming guidance, weather alerts, crop updates and local agriculture news in one place.',
-    imageAsset: 'assets/onboarding/webp/Feature_4.webp',
-  ),
+List<OnboardingSlide> buildOnboardingSlides(AppLocalizations l10n) {
+  return [
+    OnboardingSlide(
+      title: l10n.onboardingSlide1Title,
+      description: l10n.onboardingSlide1Description,
+      imageAsset: 'assets/onboarding/webp/Feature_1.webp',
+    ),
+    OnboardingSlide(
+      title: l10n.onboardingSlide2Title,
+      description: l10n.onboardingSlide2Description,
+      imageAsset: 'assets/onboarding/webp/Feature_2.webp',
+    ),
+    OnboardingSlide(
+      title: l10n.onboardingSlide3Title,
+      description: l10n.onboardingSlide3Description,
+      imageAsset: 'assets/onboarding/webp/Feature_3.webp',
+    ),
+    OnboardingSlide(
+      title: l10n.onboardingSlide4Title,
+      description: l10n.onboardingSlide4Description,
+      imageAsset: 'assets/onboarding/webp/Feature_4.webp',
+    ),
+  ];
+}
+
+const onboardingImageAssets = [
+  'assets/onboarding/webp/Feature_1.webp',
+  'assets/onboarding/webp/Feature_2.webp',
+  'assets/onboarding/webp/Feature_3.webp',
+  'assets/onboarding/webp/Feature_4.webp',
 ];

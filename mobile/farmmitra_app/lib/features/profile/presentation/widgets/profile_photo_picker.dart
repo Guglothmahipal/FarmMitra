@@ -1,3 +1,4 @@
+import 'package:farmmitra_app/core/localization/locale_extensions.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePhotoPicker extends StatelessWidget {
@@ -12,9 +13,7 @@ class ProfilePhotoPicker extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         onTap: () {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Photo upload will be connected later.'),
-            ),
+            SnackBar(content: Text(context.l10n.profilePhotoComingSoon)),
           );
         },
         child: Container(
@@ -47,7 +46,7 @@ class ProfilePhotoPicker extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Add profile photo (optional)',
+                      context.l10n.profilePhotoOptional,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: const Color(0xFF172016),
                         fontWeight: FontWeight.w900,
@@ -55,7 +54,7 @@ class ProfilePhotoPicker extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      'You can add this later from your profile',
+                      context.l10n.profilePhotoHelp,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: const Color(0xFF66735F),
                       ),

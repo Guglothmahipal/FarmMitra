@@ -34,7 +34,7 @@ class _SplashPageState extends State<SplashPage> {
     final assets = <String>[
       _backgroundAsset,
       _roleHeroAsset,
-      for (final slide in onboardingSlides) slide.imageAsset,
+      ...onboardingImageAssets,
     ];
 
     await Future.wait(

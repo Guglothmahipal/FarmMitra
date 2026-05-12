@@ -1,5 +1,5 @@
 import 'package:farmmitra_app/config/routing/app_routes.dart';
-import 'package:farmmitra_app/config/localization/language_controller.dart';
+import 'package:farmmitra_app/core/localization/locale_provider.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_state.dart';
 import 'package:farmmitra_app/features/auth/presentation/pages/otp_verification_page.dart';
@@ -35,7 +35,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   ref.listen(authControllerProvider, (_, _) => refreshNotifier.refresh());
   ref.listen(profileControllerProvider, (_, _) => refreshNotifier.refresh());
-  ref.listen(languageControllerProvider, (_, _) => refreshNotifier.refresh());
+  ref.listen(localeControllerProvider, (_, _) => refreshNotifier.refresh());
   ref.listen(splashMinimumDelayProvider, (_, _) => refreshNotifier.refresh());
   ref.onDispose(refreshNotifier.dispose);
 
@@ -44,7 +44,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     refreshListenable: refreshNotifier,
     redirect: (context, state) {
       final authState = ref.read(authControllerProvider);
-      final languageState = ref.read(languageControllerProvider);
+      final localeState = ref.read(localeControllerProvider);
       final splashDelay = ref.read(splashMinimumDelayProvider);
       final location = state.uri.path;
 
@@ -52,11 +52,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return location == AppRoutes.splash ? null : AppRoutes.splash;
       }
 
-      if (authState.status == AuthStatus.checking || languageState.isChecking) {
+      if (authState.status == AuthStatus.checking || localeState.isChecking) {
         return location == AppRoutes.splash ? null : AppRoutes.splash;
       }
 
-      if (!languageState.hasSelectedLanguage) {
+      if (!localeState.hasSelectedLocale) {
         return location == AppRoutes.languageSelection
             ? null
             : AppRoutes.languageSelection;

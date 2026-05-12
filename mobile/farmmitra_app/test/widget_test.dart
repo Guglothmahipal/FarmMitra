@@ -1,6 +1,6 @@
 import 'package:farmmitra_app/app/farmmitra_app.dart';
-import 'package:farmmitra_app/config/localization/app_language.dart';
-import 'package:farmmitra_app/config/localization/language_controller.dart';
+import 'package:farmmitra_app/core/localization/app_locale.dart';
+import 'package:farmmitra_app/core/localization/locale_provider.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/auth_session.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/local_account.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/mock_google_account.dart';
@@ -32,10 +32,10 @@ void main() {
           ),
           profileRepositoryProvider.overrideWith((ref) => _ProfileRepo()),
           jobsRepositoryProvider.overrideWith((ref) => _JobsRepo()),
-          languageStateOverrideProvider.overrideWithValue(
-            const LanguageState(
-              language: AppLanguage.english,
-              hasSelectedLanguage: true,
+          localeStateOverrideProvider.overrideWithValue(
+            const LocaleState(
+              locale: AppLocale.english,
+              hasSelectedLocale: true,
             ),
           ),
         ],

@@ -1,8 +1,11 @@
 import 'package:farmmitra_app/config/routing/app_routes.dart';
+import 'package:farmmitra_app/core/localization/locale_extensions.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/mock_google_account.dart';
+import 'package:farmmitra_app/features/auth/domain/entities/user_role.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:farmmitra_app/features/auth/presentation/widgets/auth_background.dart';
 import 'package:farmmitra_app/features/auth/presentation/widgets/auth_header.dart';
+import 'package:farmmitra_app/features/auth/presentation/widgets/auth_keyboard_safe_body.dart';
 import 'package:farmmitra_app/features/auth/presentation/widgets/google_auth_button.dart';
 import 'package:farmmitra_app/features/auth/presentation/widgets/phone_input_field.dart';
 import 'package:farmmitra_app/shared/widgets/app_error_message.dart';
@@ -37,93 +40,60 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
-    final viewInsets = MediaQuery.viewInsetsOf(context);
+    final l10n = context.l10n;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: AuthBackground(
-        child: SafeArea(
-          child: Stack(
-            children: [
-              Positioned(
-                top: 8,
-                left: 12,
-                child: IconButton.filledTonal(
-                  onPressed: () => context.go(AppRoutes.roleSelection),
-                  icon: const Icon(Icons.arrow_back_rounded),
+        child: AuthKeyboardSafeBody(
+          onBack: () => context.go(AppRoutes.roleSelection),
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: 1),
+            duration: const Duration(milliseconds: 520),
+            curve: Curves.easeOutCubic,
+            builder: (context, value, child) {
+              return Opacity(
+                opacity: value,
+                child: Transform.translate(
+                  offset: Offset(0, 18 * (1 - value)),
+                  child: child,
                 ),
-              ),
-              AnimatedPadding(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
-                padding: EdgeInsets.fromLTRB(
-                  20,
-                  54,
-                  20,
-                  viewInsets.bottom + 18,
-                ),
-                child: Center(
-                  child: SingleChildScrollView(
-                    keyboardDismissBehavior:
-                        ScrollViewKeyboardDismissBehavior.onDrag,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 430),
-                      child: TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0, end: 1),
-                        duration: const Duration(milliseconds: 520),
-                        curve: Curves.easeOutCubic,
-                        builder: (context, value, child) {
-                          return Opacity(
-                            opacity: value,
-                            child: Transform.translate(
-                              offset: Offset(0, 18 * (1 - value)),
-                              child: child,
-                            ),
-                          );
-                        },
-                        child: _AuthCard(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              const AuthHeader(
-                                title: 'Welcome to KhetRojgar',
-                                subtitle:
-                                    'Securely login to manage your farm and access opportunities.',
-                              ),
-                              const SizedBox(height: 22),
-                              PhoneInputField(controller: _phoneController),
-                              if (authState.errorMessage != null) ...[
-                                const SizedBox(height: 12),
-                                AppErrorMessage(
-                                  message: authState.errorMessage!,
-                                ),
-                              ],
-                              const SizedBox(height: 18),
-                              _OtpButton(
-                                isLoading: _isOtpSubmitting,
-                                onPressed: _isOtpSubmitting ? null : _submit,
-                              ),
-                              const SizedBox(height: 15),
-                              const _DividerLabel(label: 'or continue with'),
-                              const SizedBox(height: 14),
-                              GoogleAuthButton(
-                                isLoading: _isGoogleSubmitting,
-                                onPressed: _isGoogleSubmitting
-                                    ? null
-                                    : _showGoogleMockSheet,
-                              ),
-                              const SizedBox(height: 20),
-                              const _TrustRow(),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+              );
+            },
+            child: _AuthCard(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  AuthHeader(
+                    title: l10n.loginWelcomeTitle,
+                    subtitle: l10n.loginWelcomeSubtitle,
                   ),
-                ),
+                  const SizedBox(height: 22),
+                  PhoneInputField(controller: _phoneController),
+                  if (authState.errorMessage != null) ...[
+                    const SizedBox(height: 12),
+                    AppErrorMessage(message: authState.errorMessage!),
+                  ],
+                  const SizedBox(height: 18),
+                  _OtpButton(
+                    isLoading: _isOtpSubmitting,
+                    onPressed: _isOtpSubmitting ? null : _submit,
+                  ),
+                  const SizedBox(height: 15),
+                  _DividerLabel(label: l10n.loginOrContinueWith),
+                  const SizedBox(height: 14),
+                  GoogleAuthButton(
+                    isLoading: _isGoogleSubmitting,
+                    onPressed: _isGoogleSubmitting
+                        ? null
+                        : _showGoogleMockSheet,
+                  ),
+                  const SizedBox(height: 20),
+                  const _TrustRow(),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -136,7 +106,7 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
     if (role == null) {
       setState(() => _isGoogleSubmitting = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a role first.')),
+        SnackBar(content: Text(context.l10n.loginSelectRoleFirst)),
       );
       return;
     }
@@ -158,14 +128,16 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Choose Google account',
+                      context.l10n.loginChooseGoogleAccount,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w900,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Continue as ${role.label} with a saved local account.',
+                      context.l10n.loginContinueAsRole(
+                        _roleLabel(context, role),
+                      ),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: const Color(0xFF67705F),
                       ),
@@ -200,9 +172,9 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
                       ),
                   ],
                 ),
-                error: (_, _) => const ListTile(
-                  leading: Icon(Icons.error_outline),
-                  title: Text('Could not load mock Google accounts'),
+                error: (_, _) => ListTile(
+                  leading: const Icon(Icons.error_outline),
+                  title: Text(context.l10n.loginGoogleAccountsError),
                 ),
                 loading: () => const Padding(
                   padding: EdgeInsets.all(28),
@@ -253,6 +225,12 @@ class _PhoneLoginPageState extends ConsumerState<PhoneLoginPage> {
     if (mounted) {
       setState(() => _isOtpSubmitting = false);
     }
+  }
+
+  String _roleLabel(BuildContext context, UserRole role) {
+    return role == UserRole.farmer
+        ? context.l10n.roleFarmerTitle
+        : context.l10n.roleWorkerTitle;
   }
 }
 
@@ -342,7 +320,7 @@ class _OtpButtonState extends State<_OtpButton> {
                           ),
                           const SizedBox(width: 10),
                           Text(
-                            'Sending OTP...',
+                            context.l10n.loginSendingOtp,
                             style: Theme.of(context).textTheme.titleSmall
                                 ?.copyWith(
                                   color: Colors.white,
@@ -355,7 +333,7 @@ class _OtpButtonState extends State<_OtpButton> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Continue with OTP',
+                            context.l10n.loginContinueOtp,
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
                                   color: Colors.white,
@@ -409,10 +387,10 @@ class _TrustRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const items = [
-      (Icons.verified_user_outlined, 'Secure Login'),
-      (Icons.lock_outline_rounded, 'Data Privacy'),
-      (Icons.flash_on_rounded, 'Fast OTP'),
+    final items = [
+      (Icons.verified_user_outlined, context.l10n.trustSecureLogin),
+      (Icons.lock_outline_rounded, context.l10n.trustDataPrivacy),
+      (Icons.flash_on_rounded, context.l10n.trustFastOtp),
     ];
 
     return Row(

@@ -1,3 +1,4 @@
+import 'package:farmmitra_app/core/localization/locale_extensions.dart';
 import 'package:flutter/material.dart';
 
 class GoogleAuthButton extends StatefulWidget {
@@ -95,7 +96,7 @@ class _GoogleAuthButtonState extends State<GoogleAuthButton> {
                         const SizedBox(width: 12),
                       ],
                       Text(
-                        'Continue with Google',
+                        context.l10n.loginGoogle,
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(
                               color: Colors.white,

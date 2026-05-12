@@ -1,4 +1,5 @@
 import 'package:farmmitra_app/config/routing/app_routes.dart';
+import 'package:farmmitra_app/core/localization/locale_extensions.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/user_role.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:farmmitra_app/features/profile/domain/entities/farmer_profile.dart';
@@ -50,15 +51,13 @@ class _ProfileFormPageState extends ConsumerState<ProfileFormPage> {
     final role = authState.selectedRole;
 
     if (role == null) {
-      return const AppPageScaffold(
-        title: 'Profile',
-        body: AppLoadingView(message: 'Loading profile...'),
+      return AppPageScaffold(
+        title: context.l10n.profileTitle,
+        body: AppLoadingView(message: context.l10n.profileLoading),
       );
     }
 
     _hydrateOnce(role, authState.phoneNumber);
-
-    final viewInsets = MediaQuery.viewInsetsOf(context);
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -66,7 +65,11 @@ class _ProfileFormPageState extends ConsumerState<ProfileFormPage> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFF6FAEF),
         elevation: 0,
-        title: Text(widget.isEdit ? 'Edit profile' : 'Complete profile'),
+        title: Text(
+          widget.isEdit
+              ? context.l10n.profileEditTitle
+              : context.l10n.profileCompleteTitle,
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: _handleBack,
@@ -78,18 +81,18 @@ class _ProfileFormPageState extends ConsumerState<ProfileFormPage> {
           children: [
             ListView(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: EdgeInsets.fromLTRB(16, 6, 16, 96 + viewInsets.bottom),
+              padding: const EdgeInsets.fromLTRB(16, 6, 16, 96),
               children: [
                 _ProfileSetupHeader(role: role),
                 const SizedBox(height: 16),
                 ProfileSectionCard(
-                  title: 'Basic details',
+                  title: context.l10n.profileBasicDetails,
                   icon: Icons.person_outline,
                   child: Column(
                     children: [
                       ProfileTextFormField(
                         controller: _fullNameController,
-                        label: 'Full name',
+                        label: context.l10n.profileFullName,
                         prefixIcon: Icons.badge_outlined,
                         validator: _required,
                       ),
@@ -100,13 +103,13 @@ class _ProfileFormPageState extends ConsumerState<ProfileFormPage> {
                 ),
                 const SizedBox(height: 12),
                 ProfileSectionCard(
-                  title: 'Location',
+                  title: context.l10n.profileLocation,
                   icon: Icons.location_on_outlined,
                   child: Column(
                     children: [
                       ProfileTextFormField(
                         controller: _villageController,
-                        label: 'Village / town',
+                        label: context.l10n.profileVillageTown,
                         validator: _required,
                       ),
                       const SizedBox(height: 10),
@@ -128,10 +131,10 @@ class _ProfileFormPageState extends ConsumerState<ProfileFormPage> {
                   ),
                 ],
                 const SizedBox(height: 12),
-                const ProfileSectionCard(
-                  title: 'Profile photo',
+                ProfileSectionCard(
+                  title: context.l10n.profilePhotoTitle,
                   icon: Icons.photo_camera_outlined,
-                  child: ProfilePhotoPicker(),
+                  child: const ProfilePhotoPicker(),
                 ),
                 if (profileState.errorMessage != null) ...[
                   const SizedBox(height: 12),
@@ -142,7 +145,9 @@ class _ProfileFormPageState extends ConsumerState<ProfileFormPage> {
             Align(
               alignment: Alignment.bottomCenter,
               child: _ProfileSaveBar(
-                label: widget.isEdit ? 'Save changes' : 'Save profile',
+                label: widget.isEdit
+                    ? context.l10n.profileSaveChanges
+                    : context.l10n.profileSaveProfile,
                 isLoading: profileState.isSaving,
                 onPressed: _save,
               ),
@@ -250,7 +255,7 @@ class _ProfileFormPageState extends ConsumerState<ProfileFormPage> {
 
   String? _required(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Required';
+      return context.l10n.commonRequired;
     }
     return null;
   }
@@ -303,7 +308,7 @@ class _ProfileSetupHeader extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Complete your profile',
+                    context.l10n.profileHeaderTitle,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color: const Color(0xFF172016),
                       fontWeight: FontWeight.w900,
@@ -313,8 +318,8 @@ class _ProfileSetupHeader extends StatelessWidget {
                   const SizedBox(height: 5),
                   Text(
                     isFarmer
-                        ? 'Add the basics now. Farm details can be completed later.'
-                        : 'Add the basics now. Work details can be completed later.',
+                        ? context.l10n.profileHeaderFarmerSubtitle
+                        : context.l10n.profileHeaderWorkerSubtitle,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: const Color(0xFF66735F),
                       height: 1.32,
@@ -410,7 +415,7 @@ class _ProfileSaveBarState extends State<_ProfileSaveBar> {
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  'Saving...',
+                                  context.l10n.commonSaving,
                                   style: Theme.of(context).textTheme.titleSmall
                                       ?.copyWith(
                                         color: Colors.white,
@@ -466,7 +471,7 @@ class _WorkerFields extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ProfileSectionCard(
-      title: 'Work details',
+      title: context.l10n.profileWorkDetails,
       icon: Icons.handyman_outlined,
       child: Column(
         children: [
@@ -482,8 +487,8 @@ class _WorkerFields extends StatelessWidget {
             ),
             child: SwitchListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-              title: const Text('Available for work'),
-              subtitle: const Text('Show availability in worker matching'),
+              title: Text(context.l10n.profileAvailableForWork),
+              subtitle: Text(context.l10n.profileAvailabilitySubtitle),
               value: isAvailable,
               onChanged: onAvailabilityChanged,
               activeThumbColor: const Color(0xFF2F7D3C),

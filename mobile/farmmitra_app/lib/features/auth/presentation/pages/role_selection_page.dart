@@ -1,4 +1,5 @@
 import 'package:farmmitra_app/config/routing/app_routes.dart';
+import 'package:farmmitra_app/core/localization/locale_extensions.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/user_role.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:farmmitra_app/features/auth/presentation/widgets/role_selection_card.dart';
@@ -21,15 +22,16 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage> {
   Widget build(BuildContext context) {
     final selectedRole = _selectedRole;
     final bottomPadding = MediaQuery.paddingOf(context).bottom;
+    final l10n = context.l10n;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6FAEF),
       body: Column(
         children: [
-          const WelcomeHeroSection(
+          WelcomeHeroSection(
             imageAsset: 'assets/onboarding/webp/Choose_Role.webp',
-            title: 'KhetRojgar',
-            subtitle: 'Choose your role to continue',
+            title: l10n.appName,
+            subtitle: l10n.roleHeroSubtitle,
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -38,7 +40,7 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'How will you use KhetRojgar?',
+                    l10n.roleQuestion,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color: const Color(0xFF172016),
                       fontWeight: FontWeight.w900,
@@ -47,7 +49,7 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Select one option now. You can test farmer and worker accounts separately.',
+                    l10n.roleDescription,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: const Color(0xFF67705F),
                       height: 1.35,
@@ -57,9 +59,8 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage> {
                   _AnimatedRoleCard(
                     delay: const Duration(milliseconds: 80),
                     child: RoleSelectionCard(
-                      title: 'Farmer',
-                      description:
-                          'Post labour jobs, find workers and manage farm operations.',
+                      title: l10n.roleFarmerTitle,
+                      description: l10n.roleFarmerDescription,
                       icon: Icons.agriculture_rounded,
                       isSelected: selectedRole == UserRole.farmer,
                       gradient: const [Color(0xFF2F7D3C), Color(0xFF5EAE59)],
@@ -71,9 +72,8 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage> {
                   _AnimatedRoleCard(
                     delay: const Duration(milliseconds: 160),
                     child: RoleSelectionCard(
-                      title: 'Worker',
-                      description:
-                          'Find nearby farm jobs and manage your daily work.',
+                      title: l10n.roleWorkerTitle,
+                      description: l10n.roleWorkerDescription,
                       icon: Icons.engineering_rounded,
                       isSelected: selectedRole == UserRole.worker,
                       gradient: const [Color(0xFF956625), Color(0xFFE4A843)],
@@ -120,7 +120,10 @@ class _RoleSelectionPageState extends ConsumerState<RoleSelectionPage> {
             );
           },
           child: selectedRole == null
-              ? const _SelectRoleHint(key: ValueKey('role-hint'))
+              ? _SelectRoleHint(
+                  key: const ValueKey('role-hint'),
+                  label: l10n.roleSelectHint,
+                )
               : Column(
                   key: const ValueKey('role-actions'),
                   mainAxisSize: MainAxisSize.min,
@@ -218,7 +221,7 @@ class _PremiumContinueButtonState extends State<_PremiumContinueButton> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Continue',
+                      context.l10n.commonContinue,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w900,
@@ -242,12 +245,14 @@ class _PremiumContinueButtonState extends State<_PremiumContinueButton> {
 }
 
 class _SelectRoleHint extends StatelessWidget {
-  const _SelectRoleHint({super.key});
+  const _SelectRoleHint({required this.label, super.key});
+
+  final String label;
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      'Select Farmer or Worker to continue',
+      label,
       key: key,
       textAlign: TextAlign.center,
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(

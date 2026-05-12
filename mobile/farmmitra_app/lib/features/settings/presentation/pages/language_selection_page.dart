@@ -1,6 +1,7 @@
-import 'package:farmmitra_app/config/localization/app_language.dart';
-import 'package:farmmitra_app/config/localization/language_controller.dart';
 import 'package:farmmitra_app/config/routing/app_routes.dart';
+import 'package:farmmitra_app/core/localization/app_locale.dart';
+import 'package:farmmitra_app/core/localization/locale_extensions.dart';
+import 'package:farmmitra_app/core/localization/locale_provider.dart';
 import 'package:farmmitra_app/shared/widgets/app_page_scaffold.dart';
 import 'package:farmmitra_app/shared/widgets/app_primary_button.dart';
 import 'package:flutter/material.dart';
@@ -18,14 +19,17 @@ class LanguageSelectionPage extends ConsumerStatefulWidget {
 }
 
 class _LanguageSelectionPageState extends ConsumerState<LanguageSelectionPage> {
-  AppLanguage? _selectedLanguage;
+  AppLocale? _selectedLocale;
 
   @override
   Widget build(BuildContext context) {
-    final selectedLanguage = _selectedLanguage;
+    final selectedLocale = _selectedLocale;
+    final l10n = context.l10n;
 
     return AppPageScaffold(
-      title: widget.isInitialSelection ? 'Choose Language' : 'Change Language',
+      title: widget.isInitialSelection
+          ? l10n.languageChooseTitle
+          : l10n.languageChangeTitle,
       showBackButton: !widget.isInitialSelection,
       body: Column(
         children: [
@@ -35,11 +39,11 @@ class _LanguageSelectionPageState extends ConsumerState<LanguageSelectionPage> {
               children: [
                 _LanguageHeader(isInitialSelection: widget.isInitialSelection),
                 const SizedBox(height: 16),
-                for (final language in AppLanguage.values) ...[
+                for (final locale in AppLocale.values) ...[
                   _LanguageCard(
-                    language: language,
-                    isSelected: selectedLanguage == language,
-                    onTap: () => setState(() => _selectedLanguage = language),
+                    locale: locale,
+                    isSelected: selectedLocale == locale,
+                    onTap: () => setState(() => _selectedLocale = locale),
                   ),
                   const SizedBox(height: 10),
                 ],
@@ -47,14 +51,16 @@ class _LanguageSelectionPageState extends ConsumerState<LanguageSelectionPage> {
             ),
           ),
           _BottomLanguageAction(
-            isVisible: selectedLanguage != null,
-            label: widget.isInitialSelection ? 'Continue' : 'Save Language',
-            onPressed: selectedLanguage == null
+            isVisible: selectedLocale != null,
+            label: widget.isInitialSelection
+                ? l10n.commonContinue
+                : l10n.languageSaveButton,
+            onPressed: selectedLocale == null
                 ? null
                 : () async {
                     await ref
-                        .read(languageControllerProvider.notifier)
-                        .selectLanguage(selectedLanguage);
+                        .read(localeControllerProvider.notifier)
+                        .selectLocale(selectedLocale);
                     if (context.mounted && widget.isInitialSelection) {
                       context.go(AppRoutes.onboarding);
                     } else if (context.mounted) {
@@ -152,8 +158,8 @@ class _LanguageHeader extends StatelessWidget {
             Expanded(
               child: Text(
                 isInitialSelection
-                    ? 'Select the language you read comfortably.'
-                    : 'Change your saved app language.',
+                    ? context.l10n.languageInitialPrompt
+                    : context.l10n.languageChangePrompt,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: scheme.onPrimaryContainer,
                   fontWeight: FontWeight.w700,
@@ -169,12 +175,12 @@ class _LanguageHeader extends StatelessWidget {
 
 class _LanguageCard extends StatelessWidget {
   const _LanguageCard({
-    required this.language,
+    required this.locale,
     required this.isSelected,
     required this.onTap,
   });
 
-  final AppLanguage language;
+  final AppLocale locale;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -196,13 +202,13 @@ class _LanguageCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      language.nativeLabel,
+                      locale.nativeLabel,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(language.label),
+                    Text(_localizedLanguageLabel(context, locale)),
                   ],
                 ),
               ),
@@ -215,5 +221,14 @@ class _LanguageCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _localizedLanguageLabel(BuildContext context, AppLocale locale) {
+    final l10n = context.l10n;
+    return switch (locale) {
+      AppLocale.english => l10n.languageEnglish,
+      AppLocale.hindi => l10n.languageHindi,
+      AppLocale.telugu => l10n.languageTelugu,
+    };
   }
 }

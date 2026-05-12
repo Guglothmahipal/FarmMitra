@@ -1,5 +1,5 @@
-import 'package:farmmitra_app/config/localization/language_controller.dart';
 import 'package:farmmitra_app/config/routing/app_routes.dart';
+import 'package:farmmitra_app/core/localization/locale_provider.dart';
 import 'package:farmmitra_app/features/auth/domain/entities/user_role.dart';
 import 'package:farmmitra_app/features/auth/presentation/controllers/auth_providers.dart';
 import 'package:farmmitra_app/shared/widgets/app_page_scaffold.dart';
@@ -12,7 +12,7 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final language = ref.watch(languageControllerProvider).language;
+    final locale = ref.watch(localeControllerProvider).locale;
 
     return AppPageScaffold(
       title: 'Settings',
@@ -23,7 +23,7 @@ class SettingsPage extends ConsumerWidget {
             child: ListTile(
               leading: const Icon(Icons.translate_outlined),
               title: const Text('Change Language'),
-              subtitle: Text('${language.nativeLabel} (${language.label})'),
+              subtitle: Text('${locale.nativeLabel} (${locale.englishLabel})'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.push(AppRoutes.language),
             ),
@@ -31,11 +31,11 @@ class SettingsPage extends ConsumerWidget {
           const SizedBox(height: 12),
           const _AccountSwitcherSection(),
           const SizedBox(height: 12),
-          const Card(
+          Card(
             child: ListTile(
-              leading: Icon(Icons.cloud_done_outlined),
-              title: Text('Offline-first mode'),
-              subtitle: Text(
+              leading: const Icon(Icons.cloud_done_outlined),
+              title: const Text('Offline-first mode'),
+              subtitle: const Text(
                 'Profile, jobs, and sessions stay available locally.',
               ),
             ),

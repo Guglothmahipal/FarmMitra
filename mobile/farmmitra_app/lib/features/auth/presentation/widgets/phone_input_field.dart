@@ -1,3 +1,4 @@
+import 'package:farmmitra_app/core/localization/locale_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -76,7 +77,7 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
                 LengthLimitingTextInputFormatter(10),
               ],
               decoration: InputDecoration(
-                hintText: 'Enter Mobile Number',
+                hintText: context.l10n.loginMobileHint,
                 counterText: '',
                 border: InputBorder.none,
                 hintStyle: TextStyle(
@@ -123,7 +124,7 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
               borderRadius: BorderRadius.circular(999),
             ),
             child: Text(
-              'Mobile number',
+              context.l10n.loginMobileLabel,
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: hasFocus
                     ? const Color(0xFF2F7D3C)
